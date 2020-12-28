@@ -14,11 +14,15 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     setLookAndFeel(&zedLookAndFeel);
+    
+    addAndMakeVisible(filterWindow);
+    
     setSize (310, 200);
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
 {
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -34,6 +38,5 @@ void ZedAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ZedAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    filterWindow.setBounds(51, 20, 219, 110);
 }

@@ -427,6 +427,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\FilterSpline.cpp">
+      <Filter>ZED\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>ZED\Source</Filter>
     </ClCompile>
@@ -2460,6 +2463,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\FilterSpline.h">
+      <Filter>ZED\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\ZedLookAndFeel.h">
       <Filter>ZED\Source</Filter>
     </ClInclude>

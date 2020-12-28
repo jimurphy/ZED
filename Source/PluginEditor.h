@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "ZedLookAndFeel.h"
+#include "FilterSpline.h"
 
 //==============================================================================
 /**
@@ -30,6 +31,7 @@ private:
     // access the processor object that created it.
     ZedAudioProcessor& audioProcessor;
     ZedLookAndFeel zedLookAndFeel;
+    FilterSpline filterWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };

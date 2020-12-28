@@ -5,6 +5,9 @@
               pluginManufacturerCode="Soco" pluginCode="Zedd" pluginVST3Category="Filter,Fx">
   <MAINGROUP id="Vm48Mw" name="ZED">
     <GROUP id="{4004AF4B-DED6-0B23-742F-99F587B27E7B}" name="Source">
+      <FILE id="WReCtY" name="FilterSpline.cpp" compile="1" resource="0"
+            file="Source/FilterSpline.cpp"/>
+      <FILE id="WztZ64" name="FilterSpline.h" compile="0" resource="0" file="Source/FilterSpline.h"/>
       <FILE id="lIqE5b" name="ZedLookAndFeel.h" compile="0" resource="0"
             file="Source/ZedLookAndFeel.h"/>
       <FILE id="BTpU5i" name="Galvji.ttc" compile="0" resource="1" file="Source/Galvji.ttc"/>
