@@ -13,9 +13,8 @@
 ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setLookAndFeel(&zedLookAndFeel);
+    setSize (310, 200);
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
@@ -30,7 +29,7 @@ void ZedAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("ZED", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void ZedAudioProcessorEditor::resized()
