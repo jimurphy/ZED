@@ -25,5 +25,15 @@ public:
     void resized() override;
 
 private:
+    
+    //Uniform b-spline basis functions, precomputed from
+    //http://www2.cs.uregina.ca/~anima/408/Notes/Interpolation/UniformBSpline.htm
+    float basis0(float);
+    float basis1(float);
+    float basis2(float);
+    float basis3(float);
+    
+    void drawSpline(juce::Graphics&);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterSpline)
 };
