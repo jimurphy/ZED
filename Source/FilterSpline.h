@@ -35,8 +35,8 @@ private:
     
     void drawSpline(juce::Graphics&);
     
-    std::vector<float> ctrlX{ 10, 10, 10, 50, 60, 80, 130, 200, 200, 200};
-    std::vector<float> ctrlY{ 50, 50, 50, 40, 70, 77, 10, 100, 100, 100};
+    std::vector<float> ctrlX{ 0,  0,  0,  90,  110, 130, 219, 219, 219};
+    std::vector<float> ctrlY{ 55, 55, 55, 55,  10,  110, 110, 110, 110};
     
     float maxSteps = 100.0f;
 
