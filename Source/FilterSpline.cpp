@@ -29,11 +29,6 @@ void FilterSpline::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("FilterSpline", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
     
     drawSpline(g);
 }
@@ -62,8 +57,56 @@ float FilterSpline::basis3(float u){
 
 void FilterSpline::drawSpline(juce::Graphics& g){
     g.setColour (juce::Colours::orange);
-    juce::Rectangle<int> area (juce::Point<int> (10, 10),
-                               juce::Point<int> (50, 50));
- 
-    g.fillRect (area);
+//    juce::Path p;
+//
+//    p.startNewSubPath(0, 0);
+//    for(int i = 0; i < 100; ++i){
+//        p.lineTo(i, i);
+//    }
+//    g.strokePath(p, juce::PathStrokeType(2));
+//    p.closeSubPath();
+    
+    g.setColour (juce::Colours::lightgreen);
+    for(int i = 0; i < ctrlX.size(); ++i)
+        g.fillEllipse(ctrlX[i], ctrlY[i], 3, 3);
+    
+    g.setColour (juce::Colours::orange);
+    int m = (int) ctrlX.size();
+    
+    for(int i = 0; i < m - 3; ++i){
+        for(int j = 0; j < maxSteps; ++j){
+            float u = j / maxSteps;
+            float qx = basis0(u) * ctrlX[i] +
+                       basis1(u) * ctrlX[i + 1] +
+                       basis2(u) * ctrlX[i + 2] +
+                       basis3(u) * ctrlX[i + 3];
+            
+            float qy = basis0(u) * ctrlY[i] +
+                       basis1(u) * ctrlY[i + 1] +
+                       basis2(u) * ctrlY[i + 2] +
+                       basis3(u) * ctrlY[i + 3];
+            
+            g.fillEllipse(qx, qy, 1, 1);
+        }
+    }
+    
+    /*
+    for (var i = 0; i < m - 3; i++) {
+    for (var j = 0; j <= max_steps; j++) {
+      var u = j / max_steps;
+      var qx = B0(u) * x[i] +
+        B1(u) * x[i + 1] +
+        B2(u) * x[i + 2] +
+        B3(u) * x[i + 3];
+
+      var qy = B0(u) * y[i] +
+        B1(u) * y[i + 1] +
+        B2(u) * y[i + 2] +
+        B3(u) * y[i + 3];
+
+      ellipse(qx, qy, 1, 1);
+    }
+  }
+
+     */
 }

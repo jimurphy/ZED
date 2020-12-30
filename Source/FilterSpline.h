@@ -35,5 +35,10 @@ private:
     
     void drawSpline(juce::Graphics&);
     
+    std::vector<float> ctrlX{ 10, 10, 10, 50, 60, 80, 130, 200, 200, 200};
+    std::vector<float> ctrlY{ 50, 50, 50, 40, 70, 77, 10, 100, 100, 100};
+    
+    float maxSteps = 100.0f;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterSpline)
 };
