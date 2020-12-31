@@ -34,7 +34,10 @@ private:
     float basis3(float);
     
     void drawSpline(juce::Graphics&);
-    
+    void drawControlPoints(juce::Graphics&);
+    void connectControlPoints(juce::Graphics&);
+
+    //LPF control points for cubic bspline
     std::vector<float> ctrlX{ 0,  0,  0,  90,  110, 130, 219, 219, 219};
     std::vector<float> ctrlY{ 55, 55, 55, 55,  10,  110, 110, 110, 110};
     

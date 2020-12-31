@@ -56,20 +56,10 @@ float FilterSpline::basis3(float u){
 }
 
 void FilterSpline::drawSpline(juce::Graphics& g){
-    g.setColour (juce::Colours::orange);
-//    juce::Path p;
-//
-//    p.startNewSubPath(0, 0);
-//    for(int i = 0; i < 100; ++i){
-//        p.lineTo(i, i);
-//    }
-//    g.strokePath(p, juce::PathStrokeType(2));
-//    p.closeSubPath();
     
-    g.setColour (juce::Colours::lightgreen);
-    for(int i = 0; i < ctrlX.size(); ++i)
-        g.fillEllipse(ctrlX[i], ctrlY[i], 3, 3);
-    
+    drawControlPoints(g);
+    connectControlPoints(g);
+
     g.setColour (juce::Colours::orange);
     int m = (int) ctrlX.size();
     
@@ -89,24 +79,22 @@ void FilterSpline::drawSpline(juce::Graphics& g){
             g.fillEllipse(qx, qy, 1, 1);
         }
     }
-    
-    /*
-    for (var i = 0; i < m - 3; i++) {
-    for (var j = 0; j <= max_steps; j++) {
-      var u = j / max_steps;
-      var qx = B0(u) * x[i] +
-        B1(u) * x[i + 1] +
-        B2(u) * x[i + 2] +
-        B3(u) * x[i + 3];
-
-      var qy = B0(u) * y[i] +
-        B1(u) * y[i + 1] +
-        B2(u) * y[i + 2] +
-        B3(u) * y[i + 3];
-
-      ellipse(qx, qy, 1, 1);
-    }
-  }
-
-     */
 }
+
+void FilterSpline::drawControlPoints(juce::Graphics& g){
+    g.setColour (juce::Colours::lightgreen);
+    for(int i = 0; i < ctrlX.size(); ++i)
+        g.fillEllipse(ctrlX[i] - 3, ctrlY[i] - 3, 6, 6); //offset by radius to draw at centre
+}
+
+void FilterSpline::connectControlPoints(juce::Graphics& g){
+    g.setColour (juce::Colours::white);
+    
+    Path myPath;
+    myPath.startNewSubPath (ctrlX[0], ctrlY[0]);
+    for(int i = 1; i < ctrlX.size() - 1; ++i){
+        myPath.lineTo (ctrlX[i], ctrlY[i]);
+    }
+    g.strokePath (myPath, PathStrokeType (1.0f));
+}
+
