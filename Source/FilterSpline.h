@@ -33,6 +33,8 @@ private:
     float basis2(float);
     float basis3(float);
     
+    void calculateLowpassControlPoints(float, float);
+    
     void drawSpline(juce::Graphics&);
     void drawControlPoints(juce::Graphics&);
     void connectControlPoints(juce::Graphics&);
@@ -42,6 +44,12 @@ private:
     std::vector<float> ctrlY{ 55, 55, 55, 55,  10,  110, 110, 110, 110};
     
     float maxSteps = 100.0f;
+    
+    //COLOURS
+    Colour backgroundColourGradient1 = juce::Colour(0xFFFACFAD);
+    Colour backgroundColourGradient2 = juce::Colour(0xFFF8BD7F);
+    Colour splineColour              = juce::Colour(0xFFF2AA7E);
 
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterSpline)
 };

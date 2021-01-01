@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="ZED\Source\jdsplib">
+      <UniqueIdentifier>{699FDC56-1588-7CAC-2D34-B61525E09FB9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ZED\Source">
       <UniqueIdentifier>{8894F70B-ABEB-86D4-6441-DBE0F60AE759}</UniqueIdentifier>
     </Filter>
@@ -2463,6 +2466,51 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\jdsplib\Adsr.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\CombFilterFB.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\CombFilterFBLP.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\CombFilterFF.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\DelayLin.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\DiffusionDelayLin.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\DSPMath.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\gain.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\lfo.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\OnePoleLP.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\oscillatormm.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\RevMini.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\RevMZ.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\voice.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\FilterSpline.h">
       <Filter>ZED\Source</Filter>
     </ClInclude>

@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "FilterSpline.h"
+#include "DSPMath.h"
 
 //==============================================================================
 FilterSpline::FilterSpline()
@@ -25,10 +26,10 @@ FilterSpline::~FilterSpline()
 
 void FilterSpline::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
-    g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.setGradientFill(juce::ColourGradient(backgroundColourGradient1, 0, 0, backgroundColourGradient2, 200, 200, false));
+    
+    g.fillRect (getLocalBounds()); //Draw rect the size of main frame to fill w/ gradient
     
     drawSpline(g);
 }
@@ -59,8 +60,9 @@ void FilterSpline::drawSpline(juce::Graphics& g){
     
     drawControlPoints(g);
     connectControlPoints(g);
-
-    g.setColour (juce::Colours::orange);
+    calculateLowpassControlPoints(80.0f, 0.7f);
+    
+    g.setColour (splineColour);
     int m = (int) ctrlX.size();
     
     for(int i = 0; i < m - 3; ++i){
@@ -76,7 +78,7 @@ void FilterSpline::drawSpline(juce::Graphics& g){
                        basis2(u) * ctrlY[i + 2] +
                        basis3(u) * ctrlY[i + 3];
             
-            g.fillEllipse(qx, qy, 1, 1);
+            g.fillEllipse(qx, qy, 3, 3);
         }
     }
 }
@@ -98,3 +100,34 @@ void FilterSpline::connectControlPoints(juce::Graphics& g){
     g.strokePath (myPath, PathStrokeType (1.0f));
 }
 
+
+//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+void FilterSpline::calculateLowpassControlPoints(float c, float q){
+    auto area = getLocalBounds();
+    
+    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float resPeakValue = map(q, 0.0f, 1.0f, area.getHeight(), 0.0f); //higher res = narrower band
+    float peakWidth = map(q, 0.0f, 1.0f, 50.0f, 1.0f);
+    
+    //repeat first 3 and last 3 values to clamp spline to control points
+    ctrlX[0] = 0;
+    ctrlX[1] = 0;
+    ctrlX[2] = 0;
+    ctrlX[3] = cutoffFreqValue - (peakWidth*1.25); //scale peakWidth a bit for cosmetic symmetry
+    ctrlX[4] = cutoffFreqValue;
+    ctrlX[5] = cutoffFreqValue + peakWidth;
+    ctrlX[6] = area.getWidth();
+    ctrlX[7] = area.getWidth();
+    ctrlX[8] = area.getWidth();
+    
+    ctrlY[0] = area.getHeight()/2.0f;
+    ctrlY[1] = area.getHeight()/2.0f;
+    ctrlY[2] = area.getHeight()/2.0f;
+    ctrlY[3] = area.getHeight()/2.0f;
+    ctrlY[4] = resPeakValue;
+    ctrlY[5] = area.getHeight();
+    ctrlY[6] = area.getHeight();
+    ctrlY[7] = area.getHeight();
+    ctrlY[8] = area.getHeight();
+
+}

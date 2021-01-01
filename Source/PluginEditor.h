@@ -32,6 +32,9 @@ private:
     ZedAudioProcessor& audioProcessor;
     ZedLookAndFeel zedLookAndFeel;
     FilterSpline filterWindow;
-
+    
+    //COLOURS
+    Colour backgroundColour = juce::Colour(0xFF3E4E50);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };

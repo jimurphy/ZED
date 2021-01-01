@@ -2,9 +2,29 @@
 
 <JUCERPROJECT id="w9sVip" name="ZED" projectType="audioplug" useAppConfig="0"
               jucerFormatVersion="1" companyName="South Coast Synthesis" companyCopyright="southcoastsynthesis"
-              pluginManufacturerCode="Soco" pluginCode="Zedd" pluginVST3Category="Filter,Fx">
+              pluginManufacturerCode="Soco" pluginCode="Zedd" pluginVST3Category="Filter,Fx"
+              headerPath="/Users/murphyji/JUCE/Projects/audio-projects/ZED/Source/jdsplib">
   <MAINGROUP id="Vm48Mw" name="ZED">
     <GROUP id="{4004AF4B-DED6-0B23-742F-99F587B27E7B}" name="Source">
+      <GROUP id="{1FF99D02-97A2-A259-F730-B9EAD2E8A27D}" name="jdsplib">
+        <FILE id="vFg7Ay" name="Adsr.h" compile="0" resource="0" file="Source/jdsplib/Adsr.h"/>
+        <FILE id="gIASOl" name="CombFilterFB.h" compile="0" resource="0" file="Source/jdsplib/CombFilterFB.h"/>
+        <FILE id="W6CZp1" name="CombFilterFBLP.h" compile="0" resource="0"
+              file="Source/jdsplib/CombFilterFBLP.h"/>
+        <FILE id="xoCV6h" name="CombFilterFF.h" compile="0" resource="0" file="Source/jdsplib/CombFilterFF.h"/>
+        <FILE id="IVAldU" name="DelayLin.h" compile="0" resource="0" file="Source/jdsplib/DelayLin.h"/>
+        <FILE id="g4TMAf" name="DiffusionDelayLin.h" compile="0" resource="0"
+              file="Source/jdsplib/DiffusionDelayLin.h"/>
+        <FILE id="pVmZtw" name="DSPMath.h" compile="0" resource="0" file="Source/jdsplib/DSPMath.h"/>
+        <FILE id="Far9Ww" name="gain.h" compile="0" resource="0" file="Source/jdsplib/gain.h"/>
+        <FILE id="IPbPSd" name="lfo.h" compile="0" resource="0" file="Source/jdsplib/lfo.h"/>
+        <FILE id="TI0Vl1" name="OnePoleLP.h" compile="0" resource="0" file="Source/jdsplib/OnePoleLP.h"/>
+        <FILE id="mmi4hG" name="oscillatormm.h" compile="0" resource="0" file="Source/jdsplib/oscillatormm.h"/>
+        <FILE id="kO1Pni" name="RevMini.h" compile="0" resource="0" file="Source/jdsplib/RevMini.h"/>
+        <FILE id="utbkrN" name="RevMZ.h" compile="0" resource="0" file="Source/jdsplib/RevMZ.h"/>
+        <FILE id="XjKtsK" name="voice.h" compile="0" resource="0" file="Source/jdsplib/voice.h"/>
+        <FILE id="PFshUF" name="ZDSVF.h" compile="0" resource="0" file="Source/jdsplib/ZDSVF.h"/>
+      </GROUP>
       <FILE id="WReCtY" name="FilterSpline.cpp" compile="1" resource="0"
             file="Source/FilterSpline.cpp"/>
       <FILE id="WztZ64" name="FilterSpline.h" compile="0" resource="0" file="Source/FilterSpline.h"/>
