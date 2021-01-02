@@ -89,7 +89,7 @@ public:
                     g.fillRect (Rectangle<float> (static_cast<float> (thumbWidth*0.33), static_cast<float> (20.0)).withCentre (isThreeVal ? thumbPoint : maxPoint));
                 }
                 else{
-                    g.fillRect (Rectangle<float> (static_cast<float> (thumbWidth*1.0), static_cast<float> (thumbWidth*1.0f)).withCentre (isThreeVal ? thumbPoint : maxPoint));
+                    g.fillRect (Rectangle<float> (static_cast<float> (20.0f), static_cast<float> (thumbWidth*0.33)).withCentre (isThreeVal ? thumbPoint : maxPoint));
                 }
             }
         }

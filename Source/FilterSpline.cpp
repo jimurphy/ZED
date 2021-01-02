@@ -40,6 +40,16 @@ void FilterSpline::resized()
     // components that your component contains..
 }
 
+void FilterSpline::setPitch(float p){
+    pitch = p;
+    repaint();
+}
+
+void FilterSpline::setRes(float r){
+    res = r;
+    repaint();
+}
+
 float FilterSpline::basis0(float u){
     return (((1 - u) * (1 - u) * (1 - u)) / 6);
 }
@@ -58,9 +68,9 @@ float FilterSpline::basis3(float u){
 
 void FilterSpline::drawSpline(juce::Graphics& g){
     
-    drawControlPoints(g);
-    connectControlPoints(g);
-    calculateLowpassControlPoints(80.0f, 0.7f);
+    //drawControlPoints(g);
+    //connectControlPoints(g);
+    calculateLowpassControlPoints(pitch, res);
     
     g.setColour (splineColour);
     int m = (int) ctrlX.size();
@@ -113,20 +123,24 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlX[0] = 0;
     ctrlX[1] = 0;
     ctrlX[2] = 0;
-    ctrlX[3] = cutoffFreqValue - (peakWidth*1.25); //scale peakWidth a bit for cosmetic symmetry
-    ctrlX[4] = cutoffFreqValue;
-    ctrlX[5] = cutoffFreqValue + peakWidth;
-    ctrlX[6] = area.getWidth();
-    ctrlX[7] = area.getWidth();
+    ctrlX[3] = cutoffFreqValue - (peakWidth + 30);
+    ctrlX[4] = cutoffFreqValue - (peakWidth*1.0f); //scale peakWidth a bit for cosmetic symmetry
+    ctrlX[5] = cutoffFreqValue;
+    ctrlX[6] = cutoffFreqValue + peakWidth;
+    ctrlX[7] = cutoffFreqValue + peakWidth + 30;
     ctrlX[8] = area.getWidth();
-    
+    ctrlX[9] = area.getWidth();
+    ctrlX[10] = area.getWidth();
+
     ctrlY[0] = area.getHeight()/2.0f;
     ctrlY[1] = area.getHeight()/2.0f;
     ctrlY[2] = area.getHeight()/2.0f;
     ctrlY[3] = area.getHeight()/2.0f;
-    ctrlY[4] = resPeakValue;
-    ctrlY[5] = area.getHeight();
+    ctrlY[4] = area.getHeight()/2.0f;
+    ctrlY[5] = resPeakValue;
     ctrlY[6] = area.getHeight();
     ctrlY[7] = area.getHeight();
     ctrlY[8] = area.getHeight();
+    ctrlY[9] = area.getHeight();
+    ctrlY[10] = area.getHeight();
 }

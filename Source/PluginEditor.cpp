@@ -21,19 +21,24 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     
     freqSlider.setSliderStyle (Slider::LinearHorizontal);
     freqSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
-    freqSlider.setPopupDisplayEnabled (true, false, this);
+    freqSlider.setRange (0.0f, 127.0f);
+    freqSlider.setPopupDisplayEnabled (false, false, this);
     freqSlider.setTextValueSuffix (" S");
     freqSlider.setColour(juce::Slider::trackColourId, sliderColour);
-    freqSlider.setValue(0.0f);
+    freqSlider.setValue(64.0f);
     addAndMakeVisible(&freqSlider);
-    
+    freqSlider.onValueChange = [this] { filterWindow.setPitch(freqSlider.getValue());};
+
     resSlider.setSliderStyle (Slider::LinearVertical);
     resSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
-    resSlider.setPopupDisplayEnabled (true, false, this);
+    resSlider.setRange (0.0f, 1.1f);
+    resSlider.setPopupDisplayEnabled (false, false, this);
     resSlider.setTextValueSuffix (" S");
     resSlider.setColour(juce::Slider::trackColourId, sliderColour);
-    resSlider.setValue(0.0f);
+    resSlider.setValue(0.7f);
     addAndMakeVisible(&resSlider);
+    resSlider.onValueChange = [this] { filterWindow.setRes(resSlider.getValue());};
+
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
@@ -56,6 +61,6 @@ void ZedAudioProcessorEditor::resized()
 {
     filterWindow.setBounds(51, 20, 219, 110);
     freqSlider.setBounds(42, 140, 237, 20);
-    resSlider.setBounds(289, 20, 20, 110);
+    resSlider.setBounds(280, 12, 20, 125);
 
 }
