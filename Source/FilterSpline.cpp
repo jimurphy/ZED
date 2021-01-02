@@ -27,7 +27,7 @@ FilterSpline::~FilterSpline()
 void FilterSpline::paint (juce::Graphics& g)
 {
 
-    g.setGradientFill(juce::ColourGradient(backgroundColourGradient1, 0, 0, backgroundColourGradient2, 200, 200, false));
+    g.setGradientFill(juce::ColourGradient(backgroundColourGradient1, 0, 0, backgroundColourGradient2, getLocalBounds().getWidth(), getLocalBounds().getHeight(), false));
     
     g.fillRect (getLocalBounds()); //Draw rect the size of main frame to fill w/ gradient
     
@@ -72,7 +72,7 @@ void FilterSpline::drawSpline(juce::Graphics& g){
                        basis1(u) * ctrlX[i + 1] +
                        basis2(u) * ctrlX[i + 2] +
                        basis3(u) * ctrlX[i + 3];
-            
+                
             float qy = basis0(u) * ctrlY[i] +
                        basis1(u) * ctrlY[i + 1] +
                        basis2(u) * ctrlY[i + 2] +
@@ -129,5 +129,4 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlY[6] = area.getHeight();
     ctrlY[7] = area.getHeight();
     ctrlY[8] = area.getHeight();
-
 }
