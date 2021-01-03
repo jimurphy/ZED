@@ -68,8 +68,8 @@ float FilterSpline::basis3(float u){
 
 void FilterSpline::drawSpline(juce::Graphics& g){
     
-    drawControlPoints(g);
-    connectControlPoints(g);
+    //drawControlPoints(g);
+    //connectControlPoints(g);
     calculateLowpassControlPoints(pitch, res);
     
     g.setColour (splineColour);
@@ -88,7 +88,7 @@ void FilterSpline::drawSpline(juce::Graphics& g){
                        basis2(u) * ctrlY[i + 2] +
                        basis3(u) * ctrlY[i + 3];
             
-            g.fillEllipse(qx, qy, 3, 3);
+            g.fillEllipse(qx, qy, 2, 2);
         }
     }
 }
@@ -115,19 +115,20 @@ void FilterSpline::connectControlPoints(juce::Graphics& g){
 void FilterSpline::calculateLowpassControlPoints(float c, float q){
     auto area = getLocalBounds();
     
+    float qScale = q / 2.0f;
     float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
-    float resPeakValue = map(min(q, 1.0f), 0.0f, 1.0f, area.getHeight(), 0.0f); //narrows band
-    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/4.0f, 1.0f);
+    float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/1.5f, -50.0f); //narrows band
+    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
     
     //repeat first 3 and last 3 values to clamp spline to control points
-    ctrlX[0] = 0;
-    ctrlX[1] = 0;
-    ctrlX[2] = 0;
-    ctrlX[3] = cutoffFreqValue - (peakWidth + (area.getWidth()/10.0f));
-    ctrlX[4] = cutoffFreqValue - peakWidth;
+    ctrlX[0] = -10;
+    ctrlX[1] = -10;
+    ctrlX[2] = -10;
+    ctrlX[3] = max(-10.0f, cutoffFreqValue - (peakWidth + (area.getWidth()/10.0f)));
+    ctrlX[4] = max(-10.0f, cutoffFreqValue - peakWidth);
     ctrlX[5] = cutoffFreqValue;
     ctrlX[6] = cutoffFreqValue + peakWidth;
-    ctrlX[7] = cutoffFreqValue + peakWidth + (area.getWidth()/7.0f);
+    ctrlX[7] = cutoffFreqValue + peakWidth + (area.getWidth()/4.0f);
     ctrlX[8] = area.getWidth();
     ctrlX[9] = area.getWidth();
     ctrlX[10] = area.getWidth();
@@ -138,7 +139,7 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlY[3] = area.getHeight()/2.0f;
     ctrlY[4] = area.getHeight()/2.0f;
     ctrlY[5] = resPeakValue;
-    ctrlY[6] = area.getHeight();
+    ctrlY[6] = area.getHeight()/1.25f;
     ctrlY[7] = area.getHeight();
     ctrlY[8] = area.getHeight();
     ctrlY[9] = area.getHeight();

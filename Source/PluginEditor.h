@@ -34,8 +34,8 @@ private:
     FilterSpline filterWindow;
     
     //COLOURS
-    Colour backgroundColour = juce::Colour(0xFF3E4E50);
-    Colour sliderColour = juce::Colour(0xFFFACFAD);
+    Colour backgroundColour = juce::Colour(0xFF684A52);
+    Colour sliderColour = juce::Colour(0xFF87A0B2);
 
     //SLIDERS
     Slider freqSlider;

@@ -49,9 +49,9 @@ private:
     float res = 0.7f;
 
     //COLOURS
-    Colour backgroundColourGradient1 = juce::Colour(0xFFFACFAD);
-    Colour backgroundColourGradient2 = juce::Colour(0xFFF8BD7F);
-    Colour splineColour              = juce::Colour(0xFFF2AA7E);
+    Colour backgroundColourGradient1 = juce::Colour(0xFF684A52);
+    Colour backgroundColourGradient2 = juce::Colour(0xFF87A0B2);
+    Colour splineColour              = juce::Colour(0xFFA4BEF3);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterSpline)
 };

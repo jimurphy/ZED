@@ -41,7 +41,7 @@ public:
             auto isTwoVal   = (style == Slider::SliderStyle::TwoValueVertical   || style == Slider::SliderStyle::TwoValueHorizontal);
             auto isThreeVal = (style == Slider::SliderStyle::ThreeValueVertical || style == Slider::SliderStyle::ThreeValueHorizontal);
 
-            auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.15f : width * 0.15f);
+            auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.1f : width * 0.1f);
 
             Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
                                      slider.isHorizontal() ? y + height * 0.5f : height + y);
@@ -86,10 +86,10 @@ public:
             {
                 g.setColour (slider.findColour (Slider::trackColourId));
                 if(slider.isHorizontal()){
-                    g.fillRect (Rectangle<float> (static_cast<float> (thumbWidth*0.33), static_cast<float> (20.0)).withCentre (isThreeVal ? thumbPoint : maxPoint));
+                    g.fillRect (Rectangle<float> (static_cast<float> (thumbWidth*0.17), static_cast<float> (20.0)).withCentre (isThreeVal ? thumbPoint : maxPoint));
                 }
                 else{
-                    g.fillRect (Rectangle<float> (static_cast<float> (20.0f), static_cast<float> (thumbWidth*0.33)).withCentre (isThreeVal ? thumbPoint : maxPoint));
+                    g.fillRect (Rectangle<float> (static_cast<float> (20.0f), static_cast<float> (thumbWidth*0.17)).withCentre (isThreeVal ? thumbPoint : maxPoint));
                 }
             }
         }
