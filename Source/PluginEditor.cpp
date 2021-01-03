@@ -62,5 +62,4 @@ void ZedAudioProcessorEditor::resized()
     filterWindow.setBounds(51, 20, 219, 110);
     freqSlider.setBounds(42, 140, 237, 20);
     resSlider.setBounds(280, 12, 20, 125);
-
 }

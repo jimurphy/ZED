@@ -68,8 +68,8 @@ float FilterSpline::basis3(float u){
 
 void FilterSpline::drawSpline(juce::Graphics& g){
     
-    //drawControlPoints(g);
-    //connectControlPoints(g);
+    drawControlPoints(g);
+    connectControlPoints(g);
     calculateLowpassControlPoints(pitch, res);
     
     g.setColour (splineColour);
@@ -116,18 +116,18 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     auto area = getLocalBounds();
     
     float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
-    float resPeakValue = map(q, 0.0f, 1.0f, area.getHeight(), 0.0f); //higher res = narrower band
-    float peakWidth = map(q, 0.0f, 1.0f, 50.0f, 1.0f);
+    float resPeakValue = map(min(q, 1.0f), 0.0f, 1.0f, area.getHeight(), 0.0f); //narrows band
+    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/4.0f, 1.0f);
     
     //repeat first 3 and last 3 values to clamp spline to control points
     ctrlX[0] = 0;
     ctrlX[1] = 0;
     ctrlX[2] = 0;
-    ctrlX[3] = cutoffFreqValue - (peakWidth + 30);
-    ctrlX[4] = cutoffFreqValue - (peakWidth*1.0f); //scale peakWidth a bit for cosmetic symmetry
+    ctrlX[3] = cutoffFreqValue - (peakWidth + (area.getWidth()/10.0f));
+    ctrlX[4] = cutoffFreqValue - peakWidth;
     ctrlX[5] = cutoffFreqValue;
     ctrlX[6] = cutoffFreqValue + peakWidth;
-    ctrlX[7] = cutoffFreqValue + peakWidth + 30;
+    ctrlX[7] = cutoffFreqValue + peakWidth + (area.getWidth()/7.0f);
     ctrlX[8] = area.getWidth();
     ctrlX[9] = area.getWidth();
     ctrlX[10] = area.getWidth();
