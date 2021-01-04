@@ -27,8 +27,10 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     freqSlider.setColour(juce::Slider::trackColourId, sliderColour);
     freqSlider.setValue(64.0f);
     addAndMakeVisible(&freqSlider);
-    freqSlider.onValueChange = [this] { filterWindow.setPitch(freqSlider.getValue());
-        freqLabel.setText(std::to_string(p2f(freqSlider.getValue())), dontSendNotification);
+    freqSlider.onValueChange = [this] {
+        filterWindow.setPitch(freqSlider.getValue());
+        std::string freqLabelString = std::to_string((int)p2f(freqSlider.getValue())).substr(0,4) + " HZ";
+        freqLabel.setText(freqLabelString, dontSendNotification);
     };
 
     resSlider.setSliderStyle (Slider::LinearVertical);
@@ -39,7 +41,11 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     resSlider.setColour(juce::Slider::trackColourId, sliderColour);
     resSlider.setValue(0.7f);
     addAndMakeVisible(&resSlider);
-    resSlider.onValueChange = [this] { filterWindow.setRes(resSlider.getValue());};
+    resSlider.onValueChange = [this] {
+        filterWindow.setRes(resSlider.getValue());
+        std::string resLabelString = "RES: " + std::to_string(resSlider.getValue()).substr(0,4);
+        resLabel.setText(resLabelString, dontSendNotification);
+    };
     
     //labels
     auto labelFont = Font(10.0);
@@ -49,7 +55,15 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     freqLabel.setBorderSize(BorderSize< int >(0));
     freqLabel.setText("220.0 HZ", dontSendNotification);
     freqLabel.setColour(Label::textColourId, backgroundColour);
-    freqLabel.setJustificationType(Justification::centredTop);
+    freqLabel.setJustificationType(Justification::left);
+    
+    addAndMakeVisible(resLabel);
+    resLabel.setFont(labelFont);
+    resLabel.setBorderSize(BorderSize< int >(0));
+    resLabel.setText("RES: 0.1", dontSendNotification);
+    resLabel.setColour(Label::textColourId, backgroundColour);
+    resLabel.setJustificationType(Justification::left);
+
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
@@ -74,5 +88,6 @@ void ZedAudioProcessorEditor::resized()
     freqSlider.setBounds(42, 140, 237, 20);
     resSlider.setBounds(280, 12, 20, 125);
     
-    freqLabel.setBounds(222, 23, 50, 50);
+    freqLabel.setBounds(225, 23, 50, 10);
+    resLabel.setBounds(225, 33, 50, 10);
 }
