@@ -12,6 +12,7 @@
 #include "PluginProcessor.h"
 #include "ZedLookAndFeel.h"
 #include "FilterSpline.h"
+#include "DSPMath.h"
 
 //==============================================================================
 /**
@@ -41,5 +42,9 @@ private:
     Slider freqSlider;
     Slider resSlider;
     
+    //LABELS
+    Label freqLabel;
+    Label resLabel;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };

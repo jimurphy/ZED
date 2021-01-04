@@ -27,7 +27,9 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     freqSlider.setColour(juce::Slider::trackColourId, sliderColour);
     freqSlider.setValue(64.0f);
     addAndMakeVisible(&freqSlider);
-    freqSlider.onValueChange = [this] { filterWindow.setPitch(freqSlider.getValue());};
+    freqSlider.onValueChange = [this] { filterWindow.setPitch(freqSlider.getValue());
+        freqLabel.setText(std::to_string(p2f(freqSlider.getValue())), dontSendNotification);
+    };
 
     resSlider.setSliderStyle (Slider::LinearVertical);
     resSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
@@ -38,7 +40,16 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
     resSlider.setValue(0.7f);
     addAndMakeVisible(&resSlider);
     resSlider.onValueChange = [this] { filterWindow.setRes(resSlider.getValue());};
+    
+    //labels
+    auto labelFont = Font(10.0);
 
+    addAndMakeVisible(freqLabel);
+    freqLabel.setFont(labelFont);
+    freqLabel.setBorderSize(BorderSize< int >(0));
+    freqLabel.setText("220.0 HZ", dontSendNotification);
+    freqLabel.setColour(Label::textColourId, backgroundColour);
+    freqLabel.setJustificationType(Justification::centredTop);
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
@@ -62,4 +73,6 @@ void ZedAudioProcessorEditor::resized()
     filterWindow.setBounds(51, 20, 219, 110);
     freqSlider.setBounds(42, 140, 237, 20);
     resSlider.setBounds(280, 12, 20, 125);
+    
+    freqLabel.setBounds(222, 23, 50, 50);
 }
