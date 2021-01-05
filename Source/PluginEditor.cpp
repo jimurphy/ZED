@@ -10,8 +10,8 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioProcessorValueTreeState& vts)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState (vts)
 {
     setLookAndFeel(&zedLookAndFeel);
     

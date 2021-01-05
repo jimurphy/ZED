@@ -27,6 +27,12 @@ public:
     void setPitch(float);
     void setRes(float);
     
+    void mouseDrag (const MouseEvent& event) override
+    {
+        DBG("Drag at: " << event.getPosition().toString());
+    }
+
+    
 private:
     //Uniform b-spline basis functions, precomputed from
     //http://www2.cs.uregina.ca/~anima/408/Notes/Interpolation/UniformBSpline.htm

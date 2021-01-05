@@ -55,5 +55,11 @@ public:
 
 private:
     //==============================================================================
+    AudioProcessorValueTreeState parameters;
+
+    //---------  Parameters
+    std::atomic<float>* cutoffParameter = nullptr;
+    std::atomic<float>* resParameter = nullptr;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)
 };

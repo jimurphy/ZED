@@ -21,7 +21,21 @@ ZedAudioProcessor::ZedAudioProcessor()
                      #endif
                        )
 #endif
+,parameters (*this, nullptr, Identifier ("Zed"), {
+std::make_unique<AudioParameterFloat> ("cutoff",        // parameterID
+                                       "Cutoff",        // parameter name
+                                       NormalisableRange<float> (0.0f, 127.0f, 1.0f),
+                                       0.0f //default val
+                                       ),
+std::make_unique<AudioParameterFloat> ("resonance",        // parameterID
+                                       "Resonance",        // parameter name
+                                       NormalisableRange<float> (0.0f, 1.1f, 0.01f),
+                                       0.7f //default val
+                                    ),
+})
 {
+    cutoffParameter               = parameters.getRawParameterValue("cutoff");
+    resParameter                  = parameters.getRawParameterValue("resonance");
 }
 
 ZedAudioProcessor::~ZedAudioProcessor()
@@ -164,21 +178,23 @@ bool ZedAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ZedAudioProcessor::createEditor()
 {
-    return new ZedAudioProcessorEditor (*this);
+    return new ZedAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
 void ZedAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = parameters.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void ZedAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (parameters.state.getType()))
+            parameters.replaceState (ValueTree::fromXml (*xmlState));
 }
 
 //==============================================================================
