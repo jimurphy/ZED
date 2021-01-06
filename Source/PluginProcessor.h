@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ZDSVF.h"
 
 //==============================================================================
 /**
@@ -60,6 +61,8 @@ private:
     //---------  Parameters
     std::atomic<float>* cutoffParameter = nullptr;
     std::atomic<float>* resParameter = nullptr;
+    
+    ZDSVF filter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)
 };

@@ -32,6 +32,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
         std::string freqLabelString = std::to_string((int)p2f(freqSlider.getValue())).substr(0,4) + " HZ";
         freqLabel.setText(freqLabelString, dontSendNotification);
     };
+    freqAttachment.reset (new SliderAttachment (valueTreeState, "cutoff", freqSlider));
 
     resSlider.setSliderStyle (Slider::LinearVertical);
     resSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
@@ -46,7 +47,8 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
         std::string resLabelString = "RES: " + std::to_string(resSlider.getValue()).substr(0,4);
         resLabel.setText(resLabelString, dontSendNotification);
     };
-    
+    resAttachment.reset (new SliderAttachment (valueTreeState, "resonance", resSlider));
+
     //labels
     auto labelFont = Font(10.0);
 

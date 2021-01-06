@@ -47,6 +47,11 @@ private:
     //LABELS
     Label freqLabel;
     Label resLabel;
+    
+    //Attachments
+    std::unique_ptr<SliderAttachment> freqAttachment;
+    std::unique_ptr<SliderAttachment> resAttachment;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };
