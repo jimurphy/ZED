@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "ZDSVF.h"
+#include "OnePoleLP.h"
 
 //==============================================================================
 /**
@@ -63,6 +64,7 @@ private:
     std::atomic<float>* resParameter = nullptr;
     
     ZDSVF filter;
+    OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)
 };

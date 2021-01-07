@@ -108,6 +108,7 @@ void ZedAudioProcessor::changeProgramName (int index, const juce::String& newNam
 void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     filter.init(AudioProcessor::getSampleRate());
+    smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
 }
 
 void ZedAudioProcessor::releaseResources()
@@ -142,8 +143,6 @@ bool ZedAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) cons
 
 void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    filter.setCutoff(*cutoffParameter);
-    filter.setQ(*resParameter);
     filter.setFilterType(3.0f);
     
     juce::ScopedNoDenormals noDenormals;
@@ -157,7 +156,11 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     auto* rChannelData = buffer.getWritePointer(1);
 
     for (int j=0;j<buffer.getNumSamples();++j){
+        float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
+        filter.setCutoff(smoothCutoff);
+        filter.setQ(*resParameter);
+
         float out = filter.dsp(lChannelData[j]);
                 
         lChannelData[j] = out;
