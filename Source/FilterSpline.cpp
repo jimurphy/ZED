@@ -13,7 +13,7 @@
 #include "DSPMath.h"
 
 //==============================================================================
-FilterSpline::FilterSpline()
+FilterSpline::FilterSpline(AudioProcessorValueTreeState& vts) : valueTreeState (vts)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.

@@ -18,8 +18,10 @@
 class FilterSpline  : public juce::Component
 {
 public:
-    FilterSpline();
+    FilterSpline(AudioProcessorValueTreeState&);
     ~FilterSpline() override;
+    
+    AudioProcessorValueTreeState& valueTreeState;
 
     void paint (juce::Graphics&) override;
     void resized() override;

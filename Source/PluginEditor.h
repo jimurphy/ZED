@@ -34,7 +34,7 @@ private:
     AudioProcessorValueTreeState& valueTreeState;
 
     ZedLookAndFeel zedLookAndFeel;
-    FilterSpline filterWindow;
+    FilterSpline filterWindow{valueTreeState};
     
     //COLOURS
     Colour backgroundColour = juce::Colour(0xFF684A52);
