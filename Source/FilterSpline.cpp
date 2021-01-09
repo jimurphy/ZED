@@ -110,7 +110,6 @@ void FilterSpline::connectControlPoints(juce::Graphics& g){
     g.strokePath (myPath, PathStrokeType (1.0f));
 }
 
-
 //Expects cutoff in MIDI range (0-127) and resonance values between 0-1
 void FilterSpline::calculateLowpassControlPoints(float c, float q){
     auto area = getLocalBounds();
@@ -144,4 +143,11 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlY[8] = area.getHeight();
     ctrlY[9] = area.getHeight();
     ctrlY[10] = area.getHeight();
+}
+
+void FilterSpline::mouseDrag (const MouseEvent& event)
+{
+    auto cutoffParamValue = valueTreeState.getParameterAsValue("cutoff");
+    cutoffParamValue.setValue(64.0f);
+
 }

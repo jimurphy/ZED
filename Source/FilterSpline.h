@@ -29,11 +29,7 @@ public:
     void setPitch(float);
     void setRes(float);
     
-    void mouseDrag (const MouseEvent& event) override
-    {
-        DBG("Drag at: " << event.getPosition().toString());
-    }
-
+    void mouseDrag (const MouseEvent&) override;
     
 private:
     //Uniform b-spline basis functions, precomputed from
