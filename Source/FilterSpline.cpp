@@ -147,7 +147,13 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
 
 void FilterSpline::mouseDrag (const MouseEvent& event)
 {
+    auto area = getLocalBounds();
     auto cutoffParamValue = valueTreeState.getParameterAsValue("cutoff");
-    cutoffParamValue.setValue(64.0f);
+    auto resParamValue = valueTreeState.getParameterAsValue("resonance");
 
+    float mouseXDragPos = event.getPosition().x;
+    float mouseYDragPos = event.getPosition().y;
+
+    cutoffParamValue.setValue(map(mouseXDragPos, 0.0f, area.getWidth(), 0.0f, 127.0f));
+    resParamValue.setValue(map(mouseYDragPos, 0.0f, area.getHeight(), 1.1f, 0.0f));
 }
