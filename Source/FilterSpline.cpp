@@ -40,6 +40,10 @@ void FilterSpline::resized()
     // components that your component contains..
 }
 
+void FilterSpline::setMode(int m){
+    filtermode = m;
+}
+
 void FilterSpline::setPitch(float p){
     pitch = p;
     repaint();
@@ -70,7 +74,15 @@ void FilterSpline::drawSpline(juce::Graphics& g){
     
     //drawControlPoints(g);
     //connectControlPoints(g);
-    calculateLowpassControlPoints(pitch, res);
+    
+    //Check what mode of filter is selected, draw appropriate type
+    switch(filtermode){
+        case lpf:
+            calculateLowpassControlPoints(pitch, res);
+            break;
+        case hpf:
+            calculateHighpassControlPoints(pitch, res);
+    }
     
     g.setColour (splineColour);
     int m = (int) ctrlX.size();
@@ -143,6 +155,41 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlY[8] = area.getHeight();
     ctrlY[9] = area.getHeight();
     ctrlY[10] = area.getHeight();
+}
+
+//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+void FilterSpline::calculateHighpassControlPoints(float c, float q){
+    auto area = getLocalBounds();
+    
+    float qScale = q / 2.0f;
+    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/1.5f, -50.0f); //narrows band
+    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
+    
+    //repeat first 3 and last 3 values to clamp spline to control points
+    ctrlX[0] = -10;
+    ctrlX[1] = -10;
+    ctrlX[2] = -10;
+    ctrlX[3] = max(-10.0f, cutoffFreqValue - (peakWidth + (area.getWidth()/10.0f)));
+    ctrlX[4] = max(-10.0f, cutoffFreqValue - peakWidth);
+    ctrlX[5] = cutoffFreqValue;
+    ctrlX[6] = cutoffFreqValue + peakWidth;
+    ctrlX[7] = cutoffFreqValue + peakWidth + (area.getWidth()/4.0f);
+    ctrlX[8] = area.getWidth();
+    ctrlX[9] = area.getWidth();
+    ctrlX[10] = area.getWidth();
+
+    ctrlY[0] = area.getHeight();
+    ctrlY[1] = area.getHeight();
+    ctrlY[2] = area.getHeight();
+    ctrlY[3] = area.getHeight();
+    ctrlY[4] = area.getHeight();
+    ctrlY[5] = resPeakValue;
+    ctrlY[6] = area.getHeight()/2.25f;
+    ctrlY[7] = area.getHeight()/2.0f;
+    ctrlY[8] = area.getHeight()/2.0f;
+    ctrlY[9] = area.getHeight()/2.0f;
+    ctrlY[10] = area.getHeight()/2.0f;    
 }
 
 void FilterSpline::mouseDrag (const MouseEvent& event)

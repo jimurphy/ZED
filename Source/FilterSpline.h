@@ -18,6 +18,8 @@
 class FilterSpline  : public juce::Component
 {
 public:
+    enum filtertype {lpf = 1, hpf = 2, bpf = 3};
+    
     FilterSpline(AudioProcessorValueTreeState&);
     ~FilterSpline() override;
     
@@ -26,6 +28,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void setMode(int);
     void setPitch(float);
     void setRes(float);
     
@@ -43,7 +46,11 @@ private:
     void drawControlPoints(juce::Graphics&);
     void connectControlPoints(juce::Graphics&);
     void calculateLowpassControlPoints(float, float);
+    void calculateHighpassControlPoints(float, float);
+    void calculateBandpassControlPoints(float, float);
 
+    int filtermode = lpf;
+    
     //LPF control points for cubic bspline
     std::vector<float> ctrlX{ 0,  0,  0,  60, 90,  110, 130, 160, 219, 219, 219};
     std::vector<float> ctrlY{ 55, 55, 55, 55, 55,  10,  110, 110, 110, 110, 110};

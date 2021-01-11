@@ -30,6 +30,12 @@ public:
     void resized() override;
 
 private:
+    
+    enum RadioButtonIds
+    {
+        FilterModeButtons = 1001
+    };
+    
     ZedAudioProcessor& audioProcessor;
     AudioProcessorValueTreeState& valueTreeState;
 
@@ -47,6 +53,13 @@ private:
     //LABELS
     Label freqLabel;
     Label resLabel;
+
+    //BUTTONS
+    TextButton lpfButton;
+    TextButton hpfButton;
+    TextButton bpfButton;
+    TextButton brfButton;
+
     
     //Attachments
     std::unique_ptr<SliderAttachment> freqAttachment;
