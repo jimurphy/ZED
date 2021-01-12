@@ -54,6 +54,18 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     lpfButton.setRadioGroupId(FilterModeButtons);
     lpfButton.setClickingTogglesState(true);
     
+    addAndMakeVisible(hpfButton);
+    hpfButton.setRadioGroupId(FilterModeButtons);
+    hpfButton.setClickingTogglesState(true);
+
+    addAndMakeVisible(bpfButton);
+    bpfButton.setRadioGroupId(FilterModeButtons);
+    bpfButton.setClickingTogglesState(true);
+
+    addAndMakeVisible(brfButton);
+    brfButton.setRadioGroupId(FilterModeButtons);
+    brfButton.setClickingTogglesState(true);
+    
     //labels
     auto labelFont = Font(10.0);
 
@@ -96,7 +108,10 @@ void ZedAudioProcessorEditor::resized()
     resSlider.setBounds(280, 12, 20, 125);
     
     lpfButton.setBounds(10, 20, 31, 20);
-    
+    hpfButton.setBounds(10, 50, 31, 20);
+    bpfButton.setBounds(10, 80, 31, 20);
+    brfButton.setBounds(10, 110, 31, 20);
+
     freqLabel.setBounds(225, 23, 50, 10);
     resLabel.setBounds(225, 33, 50, 10);
 }
