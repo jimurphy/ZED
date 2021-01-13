@@ -53,19 +53,32 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     addAndMakeVisible(lpfButton);
     lpfButton.setRadioGroupId(FilterModeButtons);
     lpfButton.setClickingTogglesState(true);
+    lpfButton.setButtonText("LP");
+    lpfButton.setColour(TextButton::buttonColourId, Colour(sliderColour));
+    lpfButton.setColour(TextButton::buttonOnColourId, Colour(backgroundColour));
+
     
     addAndMakeVisible(hpfButton);
     hpfButton.setRadioGroupId(FilterModeButtons);
     hpfButton.setClickingTogglesState(true);
+    hpfButton.setButtonText("HP");
+    hpfButton.setColour(TextButton::buttonColourId, Colour(sliderColour));
+    hpfButton.setColour(TextButton::buttonOnColourId, Colour(backgroundColour));
 
     addAndMakeVisible(bpfButton);
     bpfButton.setRadioGroupId(FilterModeButtons);
     bpfButton.setClickingTogglesState(true);
+    bpfButton.setButtonText("BP");
+    bpfButton.setColour(TextButton::buttonColourId, Colour(sliderColour));
+    bpfButton.setColour(TextButton::buttonOnColourId, Colour(backgroundColour));
 
     addAndMakeVisible(brfButton);
     brfButton.setRadioGroupId(FilterModeButtons);
     brfButton.setClickingTogglesState(true);
-    
+    brfButton.setButtonText("BR");
+    brfButton.setColour(TextButton::buttonColourId, Colour(sliderColour));
+    brfButton.setColour(TextButton::buttonOnColourId, Colour(backgroundColour));
+
     //labels
     auto labelFont = Font(10.0);
 
