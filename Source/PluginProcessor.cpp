@@ -27,15 +27,45 @@ std::make_unique<AudioParameterFloat> ("cutoff",        // parameterID
                                        NormalisableRange<float> (0.0f, 127.0f, 1.0f),
                                        0.0f //default val
                                        ),
+
 std::make_unique<AudioParameterFloat> ("resonance",        // parameterID
                                        "Resonance",        // parameter name
                                        NormalisableRange<float> (0.0f, 1.1f, 0.01f),
                                        0.7f //default val
-                                    ),
+                                       ),
+
+std::make_unique<AudioParameterFloat> ("lpfmode",         // parameterID
+                                       "LPFMode",         // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       1),                // default value
+    
+std::make_unique<AudioParameterFloat> ("hpfmode",         // parameterID
+                                       "HPFMode",         // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       1),                // default value
+    
+std::make_unique<AudioParameterFloat> ("bpfmode",         // parameterID
+                                       "BPFMode",         // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       1),                // default value
+    
+std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
+                                       "BRF Mode",        // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       1)                 // default value
 })
 {
     cutoffParameter               = parameters.getRawParameterValue("cutoff");
     resParameter                  = parameters.getRawParameterValue("resonance");
+    lpfModeParameter              = parameters.getRawParameterValue("lpfmode");
+    hpfModeParameter              = parameters.getRawParameterValue("hpfmode");
+    bpfModeParameter              = parameters.getRawParameterValue("bpfmode");
+    brfModeParameter              = parameters.getRawParameterValue("brfmode");
+
 }
 
 ZedAudioProcessor::~ZedAudioProcessor()

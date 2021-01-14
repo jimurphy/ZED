@@ -21,6 +21,7 @@ class ZedAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     ZedAudioProcessorEditor (ZedAudioProcessor&, AudioProcessorValueTreeState&);
     ~ZedAudioProcessorEditor() override;
@@ -45,6 +46,8 @@ private:
     //COLOURS
     Colour backgroundColour = juce::Colour(0xFF684A52);
     Colour sliderColour = juce::Colour(0xFF87A0B2);
+    Colour buttonOffColour = juce::Colour(0xFF756E7A);
+    Colour buttonOnColour = juce::Colour(0xFF808D9C);
 
     //SLIDERS
     Slider freqSlider;
@@ -64,6 +67,10 @@ private:
     //Attachments
     std::unique_ptr<SliderAttachment> freqAttachment;
     std::unique_ptr<SliderAttachment> resAttachment;
+    std::unique_ptr<ButtonAttachment> lpfModeAttachment;
+    std::unique_ptr<ButtonAttachment> hpfModeAttachment;
+    std::unique_ptr<ButtonAttachment> bpfModeAttachment;
+    std::unique_ptr<ButtonAttachment> brfModeAttachment;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)

@@ -60,9 +60,13 @@ private:
     AudioProcessorValueTreeState parameters;
 
     //---------  Parameters
-    std::atomic<float>* cutoffParameter = nullptr;
-    std::atomic<float>* resParameter = nullptr;
-    
+    std::atomic<float>* cutoffParameter  = nullptr;
+    std::atomic<float>* resParameter     = nullptr;
+    std::atomic<float>* lpfModeParameter = nullptr;
+    std::atomic<float>* hpfModeParameter = nullptr;
+    std::atomic<float>* bpfModeParameter = nullptr;
+    std::atomic<float>* brfModeParameter = nullptr;
+
     ZDSVF filter;
     OnePoleLP smootherCutoff;
 
