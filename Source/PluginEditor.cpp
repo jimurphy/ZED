@@ -99,7 +99,8 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     resLabel.setText("RES: 0.1", dontSendNotification);
     resLabel.setColour(Label::textColourId, backgroundColour);
     resLabel.setJustificationType(Justification::left);
-
+    
+    startTimerHz(60);
 }
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
@@ -116,6 +117,7 @@ void ZedAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("ZED", getLocalBounds(), juce::Justification::centred, 1);
+    
 }
 
 void ZedAudioProcessorEditor::resized()
@@ -132,4 +134,11 @@ void ZedAudioProcessorEditor::resized()
 
     freqLabel.setBounds(225, 23, 50, 10);
     resLabel.setBounds(225, 33, 50, 10);
+}
+
+void ZedAudioProcessorEditor::timerCallback()
+{
+    int filterMode = audioProcessor.filtermodeAtom.load();
+    filterWindow.setMode(filterMode);
+    repaint();
 }

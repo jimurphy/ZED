@@ -55,6 +55,9 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //atomic to hold filter mode
+    std::atomic<int> filtermodeAtom = {0};
+
 private:
     //==============================================================================
     AudioProcessorValueTreeState parameters;

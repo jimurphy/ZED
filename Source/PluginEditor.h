@@ -17,7 +17,9 @@
 //==============================================================================
 /**
 */
-class ZedAudioProcessorEditor  : public juce::AudioProcessorEditor
+class ZedAudioProcessorEditor  : public juce::AudioProcessorEditor,
+                                 private Timer
+
 {
 public:
     typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
@@ -36,6 +38,8 @@ private:
     {
         FilterModeButtons = 1001
     };
+    
+    void timerCallback() override;
     
     ZedAudioProcessor& audioProcessor;
     AudioProcessorValueTreeState& valueTreeState;

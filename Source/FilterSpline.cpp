@@ -42,6 +42,7 @@ void FilterSpline::resized()
 
 void FilterSpline::setMode(int m){
     filtermode = m;
+    repaint();
 }
 
 void FilterSpline::setPitch(float p){
@@ -82,6 +83,10 @@ void FilterSpline::drawSpline(juce::Graphics& g){
             break;
         case hpf:
             calculateHighpassControlPoints(pitch, res);
+            break;
+        default:
+            calculateLowpassControlPoints(pitch, res);
+            break;
     }
     
     g.setColour (splineColour);

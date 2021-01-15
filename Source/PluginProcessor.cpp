@@ -185,6 +185,31 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     auto* lChannelData = buffer.getWritePointer(0);
     auto* rChannelData = buffer.getWritePointer(1);
 
+    int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
+    
+    switch(filtermode){
+        case 1:
+            //LPF
+            filter.setFilterType(3.0f);
+            filtermodeAtom.store(1);
+            break;
+        case 2:
+            //HPF
+            filter.setFilterType(2.0f);
+            filtermodeAtom.store(2);
+            break;
+        case 3:
+            //BPF
+            filter.setFilterType(1.0f);
+            filtermodeAtom.store(3);
+            break;
+        case 4:
+            //BRF
+            break;
+    }
+
+    
+    
     for (int j=0;j<buffer.getNumSamples();++j){
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
