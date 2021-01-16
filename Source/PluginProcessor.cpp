@@ -190,17 +190,17 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     switch(filtermode){
         case 1:
             //LPF
-            filter.setFilterType(3.0f);
+            filter.setFilterType(3.0f); //3 = lp
             filtermodeAtom.store(1);
             break;
         case 2:
             //HPF
-            filter.setFilterType(2.0f);
+            filter.setFilterType(1.0f); //1 = hp
             filtermodeAtom.store(2);
             break;
         case 3:
             //BPF
-            filter.setFilterType(1.0f);
+            filter.setFilterType(2.0f); //2 = bp
             filtermodeAtom.store(3);
             break;
         case 4:
