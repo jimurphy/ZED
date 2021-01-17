@@ -87,6 +87,9 @@ void FilterSpline::drawSpline(juce::Graphics& g){
         case bpf:
             calculateBandpassControlPoints(pitch, res);
             break;
+        case brf:
+            calculateBandpassControlPoints(pitch, res);
+            break;
         default:
             calculateLowpassControlPoints(pitch, res);
             break;

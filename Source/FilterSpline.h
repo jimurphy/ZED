@@ -18,7 +18,7 @@
 class FilterSpline  : public juce::Component
 {
 public:
-    enum filtertype {lpf = 1, hpf = 2, bpf = 3};
+    enum filtertype {lpf = 1, hpf = 2, bpf = 3, brf = 4};
     
     FilterSpline(AudioProcessorValueTreeState&);
     ~FilterSpline() override;

@@ -205,6 +205,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             break;
         case 4:
             //BRF
+            filter.setFilterType(4.0f); //4 = br/notch
+            filtermodeAtom.store(4);
             break;
     }
 

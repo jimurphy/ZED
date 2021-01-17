@@ -84,11 +84,15 @@ public:
         bp = fasttanh(1.0*bp + 1e-18); //Nonlinear processing from pg353 of pirkle plugin book. DNC for self-osc (via M.Z.)
         lp = g*bp+z2;
         lp = fasttanh(1.0*lp + 1e-18); //Martijn suggests adding second tanh saturator to second integrator
-
+        br = hp + lp;
+        
         z1 = g*hp + bp;
         z2 = g*bp + lp;
         
-        if(filterType == 3.0){
+        if(filterType == 4.0){
+            return br;
+        }
+        else if(filterType == 3.0){
             return lp;
         }
         else if (filterType == 2.0){
@@ -117,6 +121,7 @@ private:
     float       lp = 0.0;
     float       hp = 0.0;
     float       bp = 0.0;
+    float       br = 0.0; //band reject, notch
     float       z1 = 0.0;
     float       z2 = 0.0;
 };
