@@ -22,6 +22,12 @@ ZedAudioProcessor::ZedAudioProcessor()
                        )
 #endif
 ,parameters (*this, nullptr, Identifier ("Zed"), {
+std::make_unique<AudioParameterFloat> ("drive",        // parameterID
+                                       "Drive",        // parameter name
+                                       NormalisableRange<float> (0.5f, 5.0f, 0.01f),
+                                       1.0f //default val
+                                       ),
+
 std::make_unique<AudioParameterFloat> ("cutoff",        // parameterID
                                        "Cutoff",        // parameter name
                                        NormalisableRange<float> (0.0f, 127.0f, 1.0f),
@@ -59,13 +65,13 @@ std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
                                        1)                 // default value
 })
 {
+    inputDriveParameter           = parameters.getRawParameterValue("drive");
     cutoffParameter               = parameters.getRawParameterValue("cutoff");
     resParameter                  = parameters.getRawParameterValue("resonance");
     lpfModeParameter              = parameters.getRawParameterValue("lpfmode");
     hpfModeParameter              = parameters.getRawParameterValue("hpfmode");
     bpfModeParameter              = parameters.getRawParameterValue("bpfmode");
     brfModeParameter              = parameters.getRawParameterValue("brfmode");
-
 }
 
 ZedAudioProcessor::~ZedAudioProcessor()
@@ -185,6 +191,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     auto* lChannelData = buffer.getWritePointer(0);
     auto* rChannelData = buffer.getWritePointer(1);
 
+    filter.setDrive(*inputDriveParameter);
+    
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
     
     switch(filtermode){

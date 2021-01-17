@@ -49,6 +49,16 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     };
     resAttachment.reset (new SliderAttachment (valueTreeState, "resonance", resSlider));
 
+    driveSlider.setSliderStyle (Slider::LinearVertical);
+    driveSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
+    driveSlider.setRange (1.0f, 10.0f);
+    driveSlider.setPopupDisplayEnabled (false, false, this);
+    driveSlider.setTextValueSuffix ("x");
+    driveSlider.setColour(juce::Slider::trackColourId, sliderColour);
+    driveSlider.setValue(1.0f);
+    addAndMakeVisible(&driveSlider);
+    driveAttachment.reset (new SliderAttachment (valueTreeState, "drive", driveSlider));
+
     //buttons
     addAndMakeVisible(lpfButton);
     lpfButton.setRadioGroupId(FilterModeButtons);
@@ -118,6 +128,10 @@ void ZedAudioProcessorEditor::paint (juce::Graphics& g)
     g.setFont (15.0f);
     g.drawFittedText ("ZED", getLocalBounds(), juce::Justification::centred, 1);
     
+    g.setColour(sliderColour);
+    g.setFont (11.0f);
+    g.drawFittedText ("INPUT", 12, 174, 100, 100, 9, 1.0f);
+    g.drawFittedText ("DRIVE", 12, 184, 100, 100, 9, 1.0f);
 }
 
 void ZedAudioProcessorEditor::resized()
@@ -126,6 +140,7 @@ void ZedAudioProcessorEditor::resized()
     
     freqSlider.setBounds(42, 140, 237, 20);
     resSlider.setBounds(280, 12, 20, 125);
+    driveSlider.setBounds(15, 132, 20, 50);
     
     lpfButton.setBounds(10, 20, 31, 20);
     hpfButton.setBounds(10, 50, 31, 20);

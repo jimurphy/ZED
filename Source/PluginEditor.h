@@ -56,6 +56,7 @@ private:
     //SLIDERS
     Slider freqSlider;
     Slider resSlider;
+    Slider driveSlider;
     
     //LABELS
     Label freqLabel;
@@ -69,6 +70,7 @@ private:
 
     
     //Attachments
+    std::unique_ptr<SliderAttachment> driveAttachment;
     std::unique_ptr<SliderAttachment> freqAttachment;
     std::unique_ptr<SliderAttachment> resAttachment;
     std::unique_ptr<ButtonAttachment> lpfModeAttachment;

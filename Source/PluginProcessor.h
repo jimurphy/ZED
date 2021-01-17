@@ -63,6 +63,7 @@ private:
     AudioProcessorValueTreeState parameters;
 
     //---------  Parameters
+    std::atomic<float>* inputDriveParameter  = nullptr;
     std::atomic<float>* cutoffParameter  = nullptr;
     std::atomic<float>* resParameter     = nullptr;
     std::atomic<float>* lpfModeParameter = nullptr;
