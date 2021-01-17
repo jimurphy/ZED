@@ -84,6 +84,9 @@ void FilterSpline::drawSpline(juce::Graphics& g){
         case hpf:
             calculateHighpassControlPoints(pitch, res);
             break;
+        case bpf:
+            calculateBandpassControlPoints(pitch, res);
+            break;
         default:
             calculateLowpassControlPoints(pitch, res);
             break;
@@ -223,6 +226,52 @@ void FilterSpline::calculateHighpassControlPoints(float c, float q){
     ctrlY[9] = area.getHeight()/2.0f;
     ctrlY[10] = area.getHeight()/2.0f;
 }
+
+//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+void FilterSpline::calculateBandpassControlPoints(float c, float q){
+    auto area = getLocalBounds();
+    
+    float qScale = q / 2.0f;
+    
+    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    
+    float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/2.0f, -50.0f); //narrows band
+    
+    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
+    
+    ctrlX[0] = cutoffFreqValue - area.getWidth()/2.0f;
+    ctrlX[1] = cutoffFreqValue - area.getWidth()/2.0f;
+    ctrlX[2] = cutoffFreqValue - area.getWidth()/2.0f;
+
+    ctrlX[3] = cutoffFreqValue - (4.0f * peakWidth);
+    ctrlX[4] = cutoffFreqValue - peakWidth;
+    
+    ctrlX[5] = cutoffFreqValue;
+    
+    ctrlX[6] = cutoffFreqValue + peakWidth;
+    ctrlX[7] = cutoffFreqValue + (4.0f * peakWidth);
+    
+    ctrlX[8] = cutoffFreqValue + area.getWidth()/2.0f;
+    ctrlX[9] = cutoffFreqValue + area.getWidth()/2.0f;
+    ctrlX[10] = cutoffFreqValue + area.getWidth()/2.0f;
+    
+    ctrlY[0] = area.getHeight();
+    ctrlY[1] = area.getHeight();
+    ctrlY[2] = area.getHeight();
+
+    ctrlY[3] = area.getHeight()/1.25;
+    ctrlY[4] = area.getHeight()/2.0f;
+    
+    ctrlY[5] = resPeakValue;
+    
+    ctrlY[6] = area.getHeight()/2.0f;
+    ctrlY[7] = area.getHeight()/1.25f;
+
+    ctrlY[8] = area.getHeight();
+    ctrlY[9] = area.getHeight();
+    ctrlY[10] = area.getHeight();
+}
+
 
 void FilterSpline::mouseDrag (const MouseEvent& event)
 {
