@@ -88,7 +88,7 @@ void FilterSpline::drawSpline(juce::Graphics& g){
             calculateBandpassControlPoints(pitch, res);
             break;
         case brf:
-            calculateBandpassControlPoints(pitch, res);
+            calculateBandrejectControlPoints(pitch, res);
             break;
         default:
             calculateLowpassControlPoints(pitch, res);
@@ -273,6 +273,51 @@ void FilterSpline::calculateBandpassControlPoints(float c, float q){
     ctrlY[8] = area.getHeight();
     ctrlY[9] = area.getHeight();
     ctrlY[10] = area.getHeight();
+}
+
+//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+void FilterSpline::calculateBandrejectControlPoints(float c, float q){
+    auto area = getLocalBounds();
+    
+    float qScale = q / 2.0f;
+    
+    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    
+    float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight(), area.getHeight() * 2.0f); //narrows band
+    
+    float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
+    
+    ctrlX[0] = cutoffFreqValue - area.getWidth();
+    ctrlX[1] = cutoffFreqValue - area.getWidth();
+    ctrlX[2] = cutoffFreqValue - area.getWidth();
+
+    ctrlX[3] = cutoffFreqValue - (4.0f * peakWidth);
+    ctrlX[4] = cutoffFreqValue - peakWidth;
+    
+    ctrlX[5] = cutoffFreqValue;
+    
+    ctrlX[6] = cutoffFreqValue + peakWidth;
+    ctrlX[7] = cutoffFreqValue + (4.0f * peakWidth);
+    
+    ctrlX[8] = cutoffFreqValue + area.getWidth();
+    ctrlX[9] = cutoffFreqValue + area.getWidth();
+    ctrlX[10] = cutoffFreqValue + area.getWidth();
+    
+    ctrlY[0] = area.getHeight()/2.0f;
+    ctrlY[1] = area.getHeight()/2.0f;
+    ctrlY[2] = area.getHeight()/2.0f;
+
+    ctrlY[3] = area.getHeight()/2.0f;
+    ctrlY[4] = area.getHeight()/2.0f;
+    
+    ctrlY[5] = resPeakValue;
+    
+    ctrlY[6] = area.getHeight()/2.0f;
+    ctrlY[7] = area.getHeight()/2.0f;
+
+    ctrlY[8] = area.getHeight()/2.0f;
+    ctrlY[9] = area.getHeight()/2.0f;
+    ctrlY[10] = area.getHeight()/2.0f;
 }
 
 

@@ -48,6 +48,7 @@ private:
     void calculateLowpassControlPoints(float, float);
     void calculateHighpassControlPoints(float, float);
     void calculateBandpassControlPoints(float, float);
+    void calculateBandrejectControlPoints(float, float);
 
     int filtermode = lpf;
     
