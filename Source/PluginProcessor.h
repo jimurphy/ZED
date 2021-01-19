@@ -11,6 +11,8 @@
 #include <JuceHeader.h>
 #include "ZDSVF.h"
 #include "OnePoleLP.h"
+#include "ZDSK.h"
+#include "ZDOnePole.h"
 
 //==============================================================================
 /**
@@ -72,6 +74,8 @@ private:
     std::atomic<float>* brfModeParameter = nullptr;
 
     ZDSVF filter;
+    ZDSK korgFilter;
+    ZDOnePole onePole;
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)

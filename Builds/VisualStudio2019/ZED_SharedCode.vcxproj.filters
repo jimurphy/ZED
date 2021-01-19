@@ -2508,6 +2508,12 @@
     <ClInclude Include="..\..\Source\jdsplib\voice.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\ZDOnePole.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\ZDSK.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>

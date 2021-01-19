@@ -364,11 +364,11 @@
 			path = ../../JuceLibraryCode/JucePluginDefines.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		75C1BED411921D400FB11537 = {
+		73D63F49E14BD960DFD9943D = {
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.objcpp;
-			name = "include_juce_gui_basics.mm";
-			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDOnePole.h;
+			path = ../../Source/jdsplib/ZDOnePole.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		78A33180AB666C75EF72D4A6 = {
@@ -404,6 +404,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = gain.h;
 			path = ../../Source/jdsplib/gain.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		75C1BED411921D400FB11537 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = "include_juce_gui_basics.mm";
+			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
 		8241F9ADB39B58C4A35D8FB9 = {
@@ -559,6 +566,13 @@
 			name = Cocoa.framework;
 			path = System/Library/Frameworks/Cocoa.framework;
 			sourceTree = SDKROOT;
+		};
+		C584ADE29AE9160579F1FB1E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDSK.h;
+			path = ../../Source/jdsplib/ZDSK.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		C65F25FB5863B8ECE726A85A = {
 			isa = PBXFileReference;
@@ -717,6 +731,8 @@
 				3BEC1F51DC6129705488BE3E,
 				C704C2664E5D606ECEBEC8D2,
 				56F66B769915BFBC32C83264,
+				73D63F49E14BD960DFD9943D,
+				C584ADE29AE9160579F1FB1E,
 				28B95A29840EE0005154374B,
 			);
 			name = jdsplib;
