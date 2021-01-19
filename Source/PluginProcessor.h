@@ -75,7 +75,6 @@ private:
 
     ZDSVF filter;
     ZDSK korgFilter;
-    ZDOnePole onePole;
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)

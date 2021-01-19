@@ -38,6 +38,10 @@ public:
         updateFilters();
     }
     
+    inline void setResonance(float res){
+        k = map(res, 0.0f, 1.0f, 0.0f, 2.0f);
+    }
+    
     inline void updateFilters(){
         float wd = 2.0f * MathConstants<float>::pi * cutoff;
         float T = 1.0 / sr;
@@ -75,7 +79,7 @@ private:
     float sr = 44100;
     float alpha0 = 0.0f;
     float cutoff = 0.0f;
-    float k = 0.0f;
+    float k = 1.0f;
     float saturation = 1.0f;
     
     enum{LPF1,HPF1}; //for child members
