@@ -62,16 +62,29 @@ public:
 
 private:
     //==============================================================================
+    enum FilterTypes{
+        SVFMode,
+        SKMode,
+        TLFMode,
+        DLFMode
+    };
+    
     AudioProcessorValueTreeState parameters;
 
     //---------  Parameters
     std::atomic<float>* inputDriveParameter  = nullptr;
     std::atomic<float>* cutoffParameter  = nullptr;
     std::atomic<float>* resParameter     = nullptr;
+    
     std::atomic<float>* lpfModeParameter = nullptr;
     std::atomic<float>* hpfModeParameter = nullptr;
     std::atomic<float>* bpfModeParameter = nullptr;
     std::atomic<float>* brfModeParameter = nullptr;
+    
+    std::atomic<float>* svfTypeParameter = nullptr;
+    std::atomic<float>* skTypeParameter = nullptr;
+    std::atomic<float>* tlfTypeParameter = nullptr; //transistor ladder
+    std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
 
     ZDSVF filter;
     ZDSK korgFilter;

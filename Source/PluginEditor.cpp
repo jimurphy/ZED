@@ -68,7 +68,6 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     lpfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     lpfModeAttachment.reset(new ButtonAttachment(valueTreeState, "lpfmode", lpfButton));
 
-    
     addAndMakeVisible(hpfButton);
     hpfButton.setRadioGroupId(FilterModeButtons);
     hpfButton.setClickingTogglesState(true);
@@ -93,6 +92,38 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     brfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     brfModeAttachment.reset(new ButtonAttachment(valueTreeState, "brfmode", brfButton));
 
+    addAndMakeVisible(svfButton);
+    svfButton.setRadioGroupId(FilterTypeButtons);
+    svfButton.setClickingTogglesState(true);
+    svfButton.setButtonText("SVF");
+    svfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
+    svfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
+    svfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "svftype", svfButton));
+
+    addAndMakeVisible(skButton);
+    skButton.setRadioGroupId(FilterTypeButtons);
+    skButton.setClickingTogglesState(true);
+    skButton.setButtonText("SK");
+    skButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
+    skButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
+    skTypeAttachment.reset(new ButtonAttachment(valueTreeState, "sktype", skButton));
+
+    addAndMakeVisible(tlfButton);
+    tlfButton.setRadioGroupId(FilterTypeButtons);
+    tlfButton.setClickingTogglesState(true);
+    tlfButton.setButtonText("TL");
+    tlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
+    tlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
+    tlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "tlftype", tlfButton));
+
+    addAndMakeVisible(dlfButton);
+    dlfButton.setRadioGroupId(FilterTypeButtons);
+    dlfButton.setClickingTogglesState(true);
+    dlfButton.setButtonText("DL");
+    dlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
+    dlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
+    dlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "dlftype", dlfButton));
+    
     //labels
     auto labelFont = Font(10.0);
 
@@ -146,6 +177,11 @@ void ZedAudioProcessorEditor::resized()
     hpfButton.setBounds(10, 50, 31, 20);
     bpfButton.setBounds(10, 80, 31, 20);
     brfButton.setBounds(10, 110, 31, 20);
+
+    svfButton.setBounds(50, 168, 31, 20);
+    skButton.setBounds (90, 168, 31, 20);
+    tlfButton.setBounds(130, 168, 31, 20);
+    dlfButton.setBounds(170, 168, 31, 20);
 
     freqLabel.setBounds(225, 23, 50, 10);
     resLabel.setBounds(225, 33, 50, 10);

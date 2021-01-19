@@ -36,7 +36,8 @@ private:
     
     enum RadioButtonIds
     {
-        FilterModeButtons = 1001
+        FilterModeButtons = 1001,
+        FilterTypeButtons = 1002
     };
     
     void timerCallback() override;
@@ -68,16 +69,25 @@ private:
     TextButton bpfButton;
     TextButton brfButton;
 
-    
+    TextButton svfButton;
+    TextButton skButton;
+    TextButton tlfButton;
+    TextButton dlfButton;
+
     //Attachments
     std::unique_ptr<SliderAttachment> driveAttachment;
     std::unique_ptr<SliderAttachment> freqAttachment;
     std::unique_ptr<SliderAttachment> resAttachment;
+    
     std::unique_ptr<ButtonAttachment> lpfModeAttachment;
     std::unique_ptr<ButtonAttachment> hpfModeAttachment;
     std::unique_ptr<ButtonAttachment> bpfModeAttachment;
     std::unique_ptr<ButtonAttachment> brfModeAttachment;
 
+    std::unique_ptr<ButtonAttachment> svfTypeAttachment;
+    std::unique_ptr<ButtonAttachment> skTypeAttachment;
+    std::unique_ptr<ButtonAttachment> tlfTypeAttachment; //transistor ladder
+    std::unique_ptr<ButtonAttachment> dlfTypeAttachment; //diode ladder
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };

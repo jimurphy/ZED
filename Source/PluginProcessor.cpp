@@ -50,19 +50,44 @@ std::make_unique<AudioParameterFloat> ("hpfmode",         // parameterID
                                        "HPFMode",         // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
-                                       1),                // default value
+                                       0),                // default value
     
 std::make_unique<AudioParameterFloat> ("bpfmode",         // parameterID
                                        "BPFMode",         // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
-                                       1),                // default value
+                                       0),                // default value
     
 std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
                                        "BRF Mode",        // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
-                                       1)                 // default value
+                                       0),                 // default value
+    
+std::make_unique<AudioParameterFloat> ("svftype",         // parameterID
+                                       "SVF Type",        // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       1),                // default value
+    
+std::make_unique<AudioParameterFloat> ("sktype",          // parameterID
+                                       "SK Type",         // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       0),                // default value
+    
+std::make_unique<AudioParameterFloat> ("tlftype",         // parameterID
+                                       "TLF Type",        // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       0),                // default value
+    
+std::make_unique<AudioParameterFloat> ("dlftype",         // parameterID
+                                       "DLF Type",        // parameter name
+                                       0,                 // minimum value
+                                       1,                 // maximum value
+                                       0)                 // default value
+
 })
 {
     inputDriveParameter           = parameters.getRawParameterValue("drive");
@@ -72,6 +97,10 @@ std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
     hpfModeParameter              = parameters.getRawParameterValue("hpfmode");
     bpfModeParameter              = parameters.getRawParameterValue("bpfmode");
     brfModeParameter              = parameters.getRawParameterValue("brfmode");
+    svfTypeParameter              = parameters.getRawParameterValue("svftype");
+    skTypeParameter               = parameters.getRawParameterValue("sktype");
+    tlfTypeParameter              = parameters.getRawParameterValue("tlftype");
+    dlfTypeParameter              = parameters.getRawParameterValue("dlftype");
 }
 
 ZedAudioProcessor::~ZedAudioProcessor()
@@ -198,6 +227,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
     
+    int filtertype = (*svfTypeParameter * 0) + (*skTypeParameter * 1) + (*tlfTypeParameter * 2) + (*dlfTypeParameter * 3);
+    
     switch(filtermode){
         case 1:
             //LPF
@@ -220,10 +251,10 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             filtermodeAtom.store(4);
             break;
     }
-
-    
+        
     
     for (int j=0;j<buffer.getNumSamples();++j){
+        
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
         filter.setCutoff(smoothCutoff);
@@ -232,8 +263,24 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         filter.setQ(*resParameter);
         korgFilter.setResonance(*resParameter);
 
-        //float out = filter.dsp(lChannelData[j]);
-        float out = korgFilter.dsp(lChannelData[j]);
+        float out = 0.0f;
+        
+        switch(filtertype){
+            case SVFMode:
+                out = filter.dsp(lChannelData[j]);
+                break;
+            case SKMode:
+                out = korgFilter.dsp(lChannelData[j]);
+                break;
+            case TLFMode:
+                break;
+            case DLFMode:
+                break;
+            default:
+                break;
+                //out = filter.dsp(lChannelData[j]);
+        };
+
 
         lChannelData[j] = out;
         rChannelData[j] = out;
