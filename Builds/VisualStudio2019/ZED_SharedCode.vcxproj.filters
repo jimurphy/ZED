@@ -2514,6 +2514,9 @@
     <ClInclude Include="..\..\Source\jdsplib\ZDSK.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\ZDSKHPF.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>

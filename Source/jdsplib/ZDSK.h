@@ -63,9 +63,13 @@ public:
         float y1 = lpfOP1.dsp(input);
         float s35 = hpfOP.getFeedbackOutput() + lpfOP2.getFeedbackOutput();
         float u = alpha0 * (y1 + s35);
-        
-        //Nonlinear processing - replace with other shapers
-        u = tanh(saturation * u);
+                
+        //Bipolar shaping
+        if(u >= 0.0f)
+            u = tanh(saturationpos * u);
+        else
+            u = tanh(saturationneg * u);
+            
         float y = k * lpfOP2.dsp(u);
         y = hpfOP.dsp(y);
         
@@ -80,8 +84,9 @@ private:
     float alpha0 = 0.0f;
     float cutoff = 0.0f;
     float k = 1.0f;
-    float saturation = 1.0f;
-    
+    float saturationpos = 1.0f;
+    float saturationneg = 1.5f;
+
     enum{LPF1,HPF1}; //for child members
     
     ZDOnePole lpfOP1; // Low Pass 1 pole portion

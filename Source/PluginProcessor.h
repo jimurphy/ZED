@@ -12,6 +12,7 @@
 #include "ZDSVF.h"
 #include "OnePoleLP.h"
 #include "ZDSK.h"
+#include "ZDSKHPF.h"
 #include "ZDOnePole.h"
 
 //==============================================================================
@@ -87,7 +88,7 @@ private:
     std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
 
     ZDSVF filter;
-    ZDSK korgFilter;
+    ZDSKHPF korgFilter;
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)

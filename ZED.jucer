@@ -25,6 +25,7 @@
         <FILE id="XjKtsK" name="voice.h" compile="0" resource="0" file="Source/jdsplib/voice.h"/>
         <FILE id="leRp40" name="ZDOnePole.h" compile="0" resource="0" file="Source/jdsplib/ZDOnePole.h"/>
         <FILE id="h4rX6y" name="ZDSK.h" compile="0" resource="0" file="Source/jdsplib/ZDSK.h"/>
+        <FILE id="znq9W6" name="ZDSKHPF.h" compile="0" resource="0" file="Source/jdsplib/ZDSKHPF.h"/>
         <FILE id="PFshUF" name="ZDSVF.h" compile="0" resource="0" file="Source/jdsplib/ZDSVF.h"/>
       </GROUP>
       <FILE id="WReCtY" name="FilterSpline.cpp" compile="1" resource="0"
