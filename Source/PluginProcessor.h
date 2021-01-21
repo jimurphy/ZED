@@ -88,7 +88,8 @@ private:
     std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
 
     ZDSVF filter;
-    ZDSKHPF korgFilter;
+    ZDSK korgFilterLP;
+    ZDSKHPF korgFilterHP;
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)

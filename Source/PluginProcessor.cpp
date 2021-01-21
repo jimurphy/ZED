@@ -175,8 +175,11 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     filter.init(AudioProcessor::getSampleRate());
     smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
     
-    korgFilter.init(AudioProcessor::getSampleRate());
-    korgFilter.setCutoff(64.0f);
+    korgFilterLP.init(AudioProcessor::getSampleRate());
+    korgFilterLP.setCutoff(64.0f);
+    
+    korgFilterHP.init(AudioProcessor::getSampleRate());
+    korgFilterHP.setCutoff(64.0f);
 }
 
 void ZedAudioProcessor::releaseResources()
@@ -258,10 +261,12 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
         filter.setCutoff(smoothCutoff);
-        korgFilter.setCutoff(smoothCutoff);
-        
+        korgFilterLP.setCutoff(smoothCutoff);
+        korgFilterHP.setCutoff(smoothCutoff);
+
         filter.setQ(*resParameter);
-        korgFilter.setResonance(*resParameter);
+        korgFilterLP.setResonance(*resParameter);
+        korgFilterHP.setResonance(*resParameter);
 
         float out = 0.0f;
         
@@ -270,7 +275,10 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 out = filter.dsp(lChannelData[j]);
                 break;
             case SKMode:
-                out = korgFilter.dsp(lChannelData[j]);
+                if(filtermode == 1)
+                    out = korgFilterLP.dsp(lChannelData[j]);
+                else if(filtermode == 2)
+                    out = korgFilterHP.dsp(lChannelData[j]);
                 break;
             case TLFMode:
                 break;
