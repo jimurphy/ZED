@@ -59,7 +59,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //atomic to hold filter mode
-    std::atomic<int> filtermodeAtom = {0};
+    std::atomic<int> filtermodeAtom = {0}; //LPF, HPF, etc.
+    std::atomic<int> filtertypeAtom = {0}; //SVF, SK, ladder, etc.
 
 private:
     //==============================================================================

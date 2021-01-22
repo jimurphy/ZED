@@ -40,6 +40,13 @@ private:
         FilterTypeButtons = 1002
     };
     
+    enum FilterTypes{
+        SVFMode,
+        SKMode,
+        TLFMode,
+        DLFMode
+    };
+    
     void timerCallback() override;
     
     ZedAudioProcessor& audioProcessor;

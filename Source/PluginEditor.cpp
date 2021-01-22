@@ -189,7 +189,42 @@ void ZedAudioProcessorEditor::resized()
 
 void ZedAudioProcessorEditor::timerCallback()
 {
-    int filterMode = audioProcessor.filtermodeAtom.load();
+    int filterMode = audioProcessor.filtermodeAtom.load(); // Get filter mode (HP, LP, etc.)
+    int filterType = audioProcessor.filtertypeAtom.load(); // Get filter type (SVF, SK, etc.)
+    
+    switch(filterType){
+        case SVFMode:
+            lpfButton.setEnabled(true);
+            hpfButton.setEnabled(true);
+            bpfButton.setEnabled(true);
+            brfButton.setEnabled(true);
+            break;
+        case SKMode:
+            lpfButton.setEnabled(true);
+            hpfButton.setEnabled(true);
+            bpfButton.setEnabled(false);
+            brfButton.setEnabled(false);
+            break;
+        case TLFMode:
+            lpfButton.setEnabled(false);
+            hpfButton.setEnabled(false);
+            bpfButton.setEnabled(false);
+            brfButton.setEnabled(false);
+            break;
+        case DLFMode:
+            lpfButton.setEnabled(false);
+            hpfButton.setEnabled(false);
+            bpfButton.setEnabled(false);
+            brfButton.setEnabled(false);
+            break;
+        default:
+            lpfButton.setEnabled(false);
+            hpfButton.setEnabled(false);
+            bpfButton.setEnabled(false);
+            brfButton.setEnabled(false);
+            break;
+    };
+    
     filterWindow.setMode(filterMode);
     repaint();
 }

@@ -232,6 +232,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     
     int filtertype = (*svfTypeParameter * 0) + (*skTypeParameter * 1) + (*tlfTypeParameter * 2) + (*dlfTypeParameter * 3);
     
+    filtertypeAtom.store(filtertype);
+    
     switch(filtermode){
         case 1:
             //LPF
