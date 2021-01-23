@@ -247,16 +247,31 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             break;
         case 3:
             //BPF
-            filter.setFilterType(2.0f); //2 = bp
-            filtermodeAtom.store(3);
+            if(filtertype == SVFMode){
+                filter.setFilterType(2.0f); //2 = bp
+                filtermodeAtom.store(3);
+            }
+            else{
+                //kick it back to LPF if not an SVF
+                Value lateMixParamVal = parameters.getParameterAsValue("lpfmode");
+                lateMixParamVal.setValue(1);
+                filter.setFilterType(3.0f); //3 = lp
+                filtermodeAtom.store(1);
+            }
             break;
         case 4:
             //BRF
-            filter.setFilterType(4.0f); //4 = br/notch
-            filtermodeAtom.store(4);
+            if(filtertype == SVFMode){
+                filter.setFilterType(4.0f); //4 = br/notch
+                filtermodeAtom.store(4);
+            }
+            else{
+                //kick it back to LPF if not an SVF
+                filter.setFilterType(3.0f); //3 = lp
+                filtermodeAtom.store(1);
+            }
             break;
     }
-        
     
     for (int j=0;j<buffer.getNumSamples();++j){
         
@@ -281,6 +296,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                     out = korgFilterLP.dsp(lChannelData[j]);
                 else if(filtermode == 2)
                     out = korgFilterHP.dsp(lChannelData[j]);
+                else
+                    out = korgFilterLP.dsp(lChannelData[j]);
                 break;
             case TLFMode:
                 break;
