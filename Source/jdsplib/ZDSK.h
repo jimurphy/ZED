@@ -38,6 +38,10 @@ public:
         updateFilters();
     }
     
+    inline void setDrive(float d){
+        driveGain = d;
+    }
+    
     inline void setResonance(float res){
         k = map(res, 0.0f, 1.0f, 0.0f, 2.0f);
     }
@@ -60,6 +64,7 @@ public:
     }
     
     inline float dsp(float input){
+        input = fasttanh(input * driveGain);
         float y1 = lpfOP1.dsp(input);
         float s35 = hpfOP.getFeedbackOutput() + lpfOP2.getFeedbackOutput();
         float u = alpha0 * (y1 + s35);
@@ -81,6 +86,7 @@ public:
     
 private:
     float sr = 44100;
+    float driveGain = 0.0f;
     float alpha0 = 0.0f;
     float cutoff = 0.0f;
     float k = 1.0f;
