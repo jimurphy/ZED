@@ -57,9 +57,10 @@ private:
     
     //COLOURS
     Colour backgroundColour = juce::Colour(0xFF684A52);
-    Colour sliderColour = juce::Colour(0xFF87A0B2);
-    Colour buttonOffColour = juce::Colour(0xFF756E7A);
-    Colour buttonOnColour = juce::Colour(0xFF808D9C);
+    Colour sliderColour     = juce::Colour(0xFF87A0B2);
+    Colour buttonOffColour  = juce::Colour(0xFF756E7A);
+    Colour buttonOnColour   = juce::Colour(0xFF808D9C);
+    Colour logoColour       = juce::Colour(0xFFA4BEF3);
 
     //SLIDERS
     Slider freqSlider;
