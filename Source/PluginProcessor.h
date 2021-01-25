@@ -14,6 +14,7 @@
 #include "ZDSK.h"
 #include "ZDSKHPF.h"
 #include "ZDOnePole.h"
+#include "ZDML.h"
 
 //==============================================================================
 /**
@@ -91,6 +92,7 @@ private:
     ZDSVF filter;
     ZDSK korgFilterLP;
     ZDSKHPF korgFilterHP;
+    ZDML moogLadder;
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)

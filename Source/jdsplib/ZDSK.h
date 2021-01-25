@@ -30,6 +30,10 @@ public:
         lpfOP2.filterType = LPF1;
         hpfOP.filterType = HPF1;
         
+        lpfOP1.init(44100);
+        lpfOP2.init(44100);
+        hpfOP.init(44100);
+
         updateFilters();
     }
     

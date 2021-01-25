@@ -180,6 +180,9 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     korgFilterHP.init(AudioProcessor::getSampleRate());
     korgFilterHP.setCutoff(64.0f);
+    
+    moogLadder.init(AudioProcessor::getSampleRate());
+    moogLadder.setCutoff(64.0f);
 }
 
 void ZedAudioProcessor::releaseResources()
@@ -282,10 +285,12 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         filter.setCutoff(smoothCutoff);
         korgFilterLP.setCutoff(smoothCutoff);
         korgFilterHP.setCutoff(smoothCutoff);
+        moogLadder.setCutoff(smoothCutoff);
 
         filter.setQ(*resParameter);
         korgFilterLP.setResonance(*resParameter);
         korgFilterHP.setResonance(*resParameter);
+        moogLadder.setResonance(*resParameter);
 
         float out = 0.0f;
         
@@ -310,6 +315,7 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 //out = filter.dsp(lChannelData[j]);
         };
 
+        out = moogLadder.dsp(lChannelData[j]);
 
         lChannelData[j] = out;
         rChannelData[j] = out;

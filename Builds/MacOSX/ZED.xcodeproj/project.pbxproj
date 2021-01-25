@@ -378,12 +378,12 @@
 			path = ../../Source/jdsplib/ZDOnePole.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		75C1BED411921D400FB11537 = {
+		78A33180AB666C75EF72D4A6 = {
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.objcpp;
-			name = "include_juce_gui_basics.mm";
-			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
-			sourceTree = "SOURCE_ROOT";
+			lastKnownFileType = file;
+			name = "juce_audio_plugin_client";
+			path = "~/JUCE/modules/juce_audio_plugin_client";
+			sourceTree = "<absolute>";
 		};
 		7FD778E2D2032C02D5B39F11 = {
 			isa = PBXFileReference;
@@ -413,12 +413,12 @@
 			path = ../../Source/jdsplib/gain.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		78A33180AB666C75EF72D4A6 = {
+		75C1BED411921D400FB11537 = {
 			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_audio_plugin_client";
-			path = "~/JUCE/modules/juce_audio_plugin_client";
-			sourceTree = "<absolute>";
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = "include_juce_gui_basics.mm";
+			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
+			sourceTree = "SOURCE_ROOT";
 		};
 		8241F9ADB39B58C4A35D8FB9 = {
 			isa = PBXFileReference;
@@ -503,6 +503,13 @@
 			name = "juce_data_structures";
 			path = "~/JUCE/modules/juce_data_structures";
 			sourceTree = "<absolute>";
+		};
+		9BF7FBF952A2A4FF933BA3D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDML.h;
+			path = ../../Source/jdsplib/ZDML.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		9F33C34DEE4927AC232BA306 = {
 			isa = PBXFileReference;
@@ -738,6 +745,7 @@
 				3BEC1F51DC6129705488BE3E,
 				C704C2664E5D606ECEBEC8D2,
 				56F66B769915BFBC32C83264,
+				9BF7FBF952A2A4FF933BA3D0,
 				73D63F49E14BD960DFD9943D,
 				C584ADE29AE9160579F1FB1E,
 				44E68A41AE1D0776DA025673,

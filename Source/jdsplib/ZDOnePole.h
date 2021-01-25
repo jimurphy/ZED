@@ -33,6 +33,11 @@ public:
     inline float getFeedbackOutput(){
         return(z * fb);
     }
+    
+    inline void setCutoff(float co){
+        cutoff = co;
+        updateFilter();
+    }
 
     inline void updateFilter(){
         float wd = 2.0f * MathConstants<float>::pi * cutoff;
@@ -57,7 +62,10 @@ public:
             return hpf;
 
         return lpf;
-
+    }
+    
+    inline float getZ(){
+        return z;
     }
     
 private:

@@ -23,6 +23,7 @@
         <FILE id="kO1Pni" name="RevMini.h" compile="0" resource="0" file="Source/jdsplib/RevMini.h"/>
         <FILE id="utbkrN" name="RevMZ.h" compile="0" resource="0" file="Source/jdsplib/RevMZ.h"/>
         <FILE id="XjKtsK" name="voice.h" compile="0" resource="0" file="Source/jdsplib/voice.h"/>
+        <FILE id="gAst18" name="ZDML.h" compile="0" resource="0" file="Source/jdsplib/ZDML.h"/>
         <FILE id="leRp40" name="ZDOnePole.h" compile="0" resource="0" file="Source/jdsplib/ZDOnePole.h"/>
         <FILE id="h4rX6y" name="ZDSK.h" compile="0" resource="0" file="Source/jdsplib/ZDSK.h"/>
         <FILE id="znq9W6" name="ZDSKHPF.h" compile="0" resource="0" file="Source/jdsplib/ZDSKHPF.h"/>
