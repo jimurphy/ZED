@@ -306,16 +306,14 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 else
                     out = korgFilterLP.dsp(lChannelData[j]);
                 break;
-            case TLFMode:
-                break;
+            case TLFMode: //transistor ladder mode
+                out = moogLadder.dsp(lChannelData[j]);
             case DLFMode:
                 break;
             default:
                 break;
                 //out = filter.dsp(lChannelData[j]);
         };
-
-        out = moogLadder.dsp(lChannelData[j]);
 
         lChannelData[j] = out;
         rChannelData[j] = out;
