@@ -73,8 +73,8 @@ float FilterSpline::basis3(float u){
 
 void FilterSpline::drawSpline(juce::Graphics& g){
     
-    //drawControlPoints(g);
-    //connectControlPoints(g);
+    drawControlPoints(g);
+    connectControlPoints(g);
     
     //Check what mode of filter is selected, draw appropriate type
     switch(filtermode){

@@ -152,29 +152,19 @@ ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
 //==============================================================================
 void ZedAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(backgroundColour);
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("ZED", getLocalBounds(), juce::Justification::centred, 1);
     
     g.setColour(sliderColour);
     g.setFont (11.0f);
     g.drawFittedText ("INPUT", 12, 174, 100, 100, 9, 1.0f);
     g.drawFittedText ("DRIVE", 12, 184, 100, 100, 9, 1.0f);
-    
-    g.setColour(buttonOffColour);
-    g.fillRect(210, 161, 80, 27);
-    
-    g.setColour(logoColour);
+        
+    g.setColour(sliderColour);
     g.setFont (16.0f);
     g.drawFittedText ("ZED", 213, 171, 100, 100, 9, 1.0f);
     g.setFont (9.0f);
     g.drawFittedText ("SOUTH COAST", 235, 163, 100, 100, 9, 1.0f);
     g.drawFittedText ("SYNTHESIS", 246, 170, 100, 100, 9, 1.0f);
-
-
 }
 
 void ZedAudioProcessorEditor::resized()

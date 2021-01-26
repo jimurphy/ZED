@@ -175,11 +175,8 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     filter.init(AudioProcessor::getSampleRate());
     smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
     
-    korgFilterLP.init(AudioProcessor::getSampleRate());
-    korgFilterLP.setCutoff(64.0f);
-    
-    korgFilterHP.init(AudioProcessor::getSampleRate());
-    korgFilterHP.setCutoff(64.0f);
+    korgFilter.init(AudioProcessor::getSampleRate());
+    korgFilter.setCutoff(64.0f);
     
     moogLadder.init(AudioProcessor::getSampleRate());
     moogLadder.setCutoff(64.0f);
@@ -230,8 +227,7 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     auto* rChannelData = buffer.getWritePointer(1);
 
     filter.setDrive(*inputDriveParameter);
-    korgFilterLP.setDrive(*inputDriveParameter);
-    korgFilterHP.setDrive(*inputDriveParameter);
+    korgFilter.setDrive(*inputDriveParameter);
 
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
     
@@ -243,11 +239,13 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         case 1:
             //LPF
             filter.setFilterType(3.0f); //3 = lp
+            korgFilter.setFilterType(0); //0 = lp
             filtermodeAtom.store(1);
             break;
         case 2:
             //HPF
             filter.setFilterType(1.0f); //1 = hp
+            korgFilter.setFilterType(1); //1 = hp
             filtermodeAtom.store(2);
             break;
         case 3:
@@ -283,28 +281,21 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
         filter.setCutoff(smoothCutoff);
-        korgFilterLP.setCutoff(smoothCutoff);
-        korgFilterHP.setCutoff(smoothCutoff);
+        korgFilter.setCutoff(smoothCutoff);
         moogLadder.setCutoff(smoothCutoff);
 
         filter.setQ(*resParameter);
-        korgFilterLP.setResonance(*resParameter);
-        korgFilterHP.setResonance(*resParameter);
+        korgFilter.setResonance(*resParameter);
         moogLadder.setResonance(*resParameter);
 
         float out = 0.0f;
         
         switch(filtertype){
-            case SVFMode:
+            case SVFMode: //state variable filter mode
                 out = filter.dsp(lChannelData[j]);
                 break;
-            case SKMode:
-                if(filtermode == 1)
-                    out = korgFilterLP.dsp(lChannelData[j]);
-                else if(filtermode == 2)
-                    out = korgFilterHP.dsp(lChannelData[j]);
-                else
-                    out = korgFilterLP.dsp(lChannelData[j]);
+            case SKMode: //sallen key mode
+                out = korgFilter.dsp(lChannelData[j]);
                 break;
             case TLFMode: //transistor ladder mode
                 out = moogLadder.dsp(lChannelData[j]);

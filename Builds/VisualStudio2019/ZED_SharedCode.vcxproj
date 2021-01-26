@@ -2044,6 +2044,7 @@
     <ClInclude Include="..\..\Source\jdsplib\ZDOnePole.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSK.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSKHPF.h"/>
+    <ClInclude Include="..\..\Source\jdsplib\ZDSKmm.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h"/>
     <ClInclude Include="..\..\Source\FilterSpline.h"/>
     <ClInclude Include="..\..\Source\ZedLookAndFeel.h"/>

@@ -378,6 +378,13 @@
 			path = ../../Source/jdsplib/ZDOnePole.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		75C1BED411921D400FB11537 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			name = "include_juce_gui_basics.mm";
+			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
 		78A33180AB666C75EF72D4A6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -411,13 +418,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = gain.h;
 			path = ../../Source/jdsplib/gain.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		75C1BED411921D400FB11537 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.objcpp;
-			name = "include_juce_gui_basics.mm";
-			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
 		8241F9ADB39B58C4A35D8FB9 = {
@@ -630,6 +630,13 @@
 			path = System/Library/Frameworks/CoreAudioKit.framework;
 			sourceTree = SDKROOT;
 		};
+		D31824E928561B0CCB9EBD16 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDSKmm.h;
+			path = ../../Source/jdsplib/ZDSKmm.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D3BE52E70EBD0CDCD00F625B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -749,6 +756,7 @@
 				73D63F49E14BD960DFD9943D,
 				C584ADE29AE9160579F1FB1E,
 				44E68A41AE1D0776DA025673,
+				D31824E928561B0CCB9EBD16,
 				28B95A29840EE0005154374B,
 			);
 			name = jdsplib;

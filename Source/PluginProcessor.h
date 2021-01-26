@@ -13,6 +13,7 @@
 #include "OnePoleLP.h"
 #include "ZDSK.h"
 #include "ZDSKHPF.h"
+#include "ZDSKmm.h"
 #include "ZDOnePole.h"
 #include "ZDML.h"
 
@@ -90,8 +91,7 @@ private:
     std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
 
     ZDSVF filter;
-    ZDSK korgFilterLP;
-    ZDSKHPF korgFilterHP;
+    ZDSKmm korgFilter;
     ZDML moogLadder;
     OnePoleLP smootherCutoff;
 
