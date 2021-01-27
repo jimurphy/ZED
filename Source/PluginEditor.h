@@ -17,6 +17,29 @@
 //==============================================================================
 /**
 */
+
+struct SnappingSlider  : public Slider
+{
+    float minVal = 0.6f;
+    float maxVal = 1.4f;
+    
+    void setMinMax(float min, float max){
+        minVal = min;
+        maxVal = max;
+    }
+    
+    double snapValue (double attemptedValue, DragMode dragMode) override
+    {
+        if (dragMode == notDragging)
+            return attemptedValue;  // if they're entering the value in the text-box, don't mess with it.
+
+        if (attemptedValue > minVal && attemptedValue < maxVal)
+            return((minVal+maxVal)/2.0f);
+
+        return attemptedValue;
+    }
+};
+
 class ZedAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                  private Timer
 
@@ -65,7 +88,7 @@ private:
     //SLIDERS
     Slider freqSlider;
     Slider resSlider;
-    Slider driveSlider;
+    SnappingSlider driveSlider;
     
     //LABELS
     Label freqLabel;
