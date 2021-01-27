@@ -2526,6 +2526,9 @@
     <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\CustomTooltip.h">
+      <Filter>ZED\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\FilterSpline.h">
       <Filter>ZED\Source</Filter>
     </ClInclude>

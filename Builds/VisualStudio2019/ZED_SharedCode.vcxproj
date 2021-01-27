@@ -2046,6 +2046,7 @@
     <ClInclude Include="..\..\Source\jdsplib\ZDSKHPF.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSKmm.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSVF.h"/>
+    <ClInclude Include="..\..\Source\CustomTooltip.h"/>
     <ClInclude Include="..\..\Source\FilterSpline.h"/>
     <ClInclude Include="..\..\Source\ZedLookAndFeel.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>

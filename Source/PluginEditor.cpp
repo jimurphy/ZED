@@ -19,6 +19,11 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     
     setSize (310, 200);
     
+    tooltip_window->setMillisecondsBeforeTipAppears(250);
+    tooltip_window->setLookAndFeel(&zedLookAndFeel);
+
+    tooltip_window->setColour(TooltipWindow::backgroundColourId, juce::Colours::green);
+
     freqSlider.setSliderStyle (Slider::LinearHorizontal);
     freqSlider.setTextBoxStyle (Slider::NoTextBox, false, 100, 0);
     freqSlider.setRange (0.0f, 127.0f);
@@ -96,6 +101,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     svfButton.setRadioGroupId(FilterTypeButtons);
     svfButton.setClickingTogglesState(true);
     svfButton.setButtonText("SVF");
+    svfButton.setTooltip("STATE VARIABLE FILTER");
     svfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     svfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     svfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "svftype", svfButton));
@@ -104,6 +110,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     skButton.setRadioGroupId(FilterTypeButtons);
     skButton.setClickingTogglesState(true);
     skButton.setButtonText("SK");
+    skButton.setTooltip("SALLEN-KEY FILTER");
     skButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     skButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     skTypeAttachment.reset(new ButtonAttachment(valueTreeState, "sktype", skButton));
@@ -112,6 +119,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     tlfButton.setRadioGroupId(FilterTypeButtons);
     tlfButton.setClickingTogglesState(true);
     tlfButton.setButtonText("TL");
+    tlfButton.setTooltip("TRANSISTOR LADDER FILTER");
     tlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     tlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     tlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "tlftype", tlfButton));
@@ -120,6 +128,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     dlfButton.setRadioGroupId(FilterTypeButtons);
     dlfButton.setClickingTogglesState(true);
     dlfButton.setButtonText("DL");
+    dlfButton.setTooltip("DIODE LADDER FILTER");
     dlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     dlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
     dlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "dlftype", dlfButton));
@@ -146,6 +155,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
 {
+    tooltip_window->setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
 

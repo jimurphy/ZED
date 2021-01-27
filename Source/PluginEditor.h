@@ -13,6 +13,7 @@
 #include "ZedLookAndFeel.h"
 #include "FilterSpline.h"
 #include "DSPMath.h"
+#include "CustomTooltip.h"
 
 //==============================================================================
 /**
@@ -72,6 +73,9 @@ private:
     
     void timerCallback() override;
     
+    //Single instance of tooltip window
+    SharedResourcePointer<CustomTooltip> tooltip_window;
+
     ZedAudioProcessor& audioProcessor;
     AudioProcessorValueTreeState& valueTreeState;
 

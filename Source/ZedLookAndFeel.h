@@ -116,5 +116,33 @@ public:
         g.fillRoundedRectangle (bounds, cornerSize);
     }
     
+    //tooltip w/ translucent background
+    void drawTooltip (Graphics& g, const String& text, int width, int height) override
+    {
+        Rectangle<int> bounds (width, height);
+        auto cornerSize = 0.0f;
+
+        g.setColour (juce::Colour(0xB4595959)); //Draw custom background for tooltip
+        g.fillRoundedRectangle (bounds.toFloat(), cornerSize);
+
+        layoutTooltipText (text, findColour (TooltipWindow::textColourId))
+                           .draw (g, { static_cast<float> (width), static_cast<float> (height) });
+    }
+    
+    TextLayout layoutTooltipText (const String& text, Colour colour) noexcept
+    {
+        const float tooltipFontSize = 12.0f;
+        const int maxToolTipWidth = 400;
+
+        AttributedString s;
+        s.setJustification (Justification::centred);
+        s.append (text, Font (tooltipFontSize, Font::bold), colour);
+
+        TextLayout tl;
+        tl.createLayoutWithBalancedLineLengths (s, (float) maxToolTipWidth);
+        return tl;
+    }
+
+    
     private:
 };

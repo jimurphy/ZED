@@ -518,6 +518,13 @@
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_AU_2.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		A37530E0D2221109B6136BAF = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = CustomTooltip.h;
+			path = ../../Source/CustomTooltip.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		A56531BC0DF67D4BF536ECEA = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.ttc;
@@ -766,6 +773,7 @@
 			isa = PBXGroup;
 			children = (
 				59EF61181699FAAB333D61D8,
+				A37530E0D2221109B6136BAF,
 				06C043AE40106084CCA1EEED,
 				FE4433766E94704502C3769D,
 				2FBE2B4FEC3B205D9A4AA122,

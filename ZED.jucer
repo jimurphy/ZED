@@ -30,6 +30,7 @@
         <FILE id="buN54M" name="ZDSKmm.h" compile="0" resource="0" file="Source/jdsplib/ZDSKmm.h"/>
         <FILE id="PFshUF" name="ZDSVF.h" compile="0" resource="0" file="Source/jdsplib/ZDSVF.h"/>
       </GROUP>
+      <FILE id="CNUkr6" name="CustomTooltip.h" compile="0" resource="0" file="Source/CustomTooltip.h"/>
       <FILE id="WReCtY" name="FilterSpline.cpp" compile="1" resource="0"
             file="Source/FilterSpline.cpp"/>
       <FILE id="WztZ64" name="FilterSpline.h" compile="0" resource="0" file="Source/FilterSpline.h"/>
