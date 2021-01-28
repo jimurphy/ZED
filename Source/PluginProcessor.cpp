@@ -172,14 +172,23 @@ void ZedAudioProcessor::changeProgramName (int index, const juce::String& newNam
 //==============================================================================
 void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    filter.init(AudioProcessor::getSampleRate());
+    svfL.init(AudioProcessor::getSampleRate());
+    svfR.init(AudioProcessor::getSampleRate());
+    
+    korgFilterL.init(AudioProcessor::getSampleRate());
+    korgFilterR.init(AudioProcessor::getSampleRate());
+
+    korgFilterL.setCutoff(64.0f);
+    korgFilterR.setCutoff(64.0f);
+
+    moogLadderL.init(AudioProcessor::getSampleRate());
+    moogLadderR.init(AudioProcessor::getSampleRate());
+
+    moogLadderL.setCutoff(64.0f);
+    moogLadderR.setCutoff(64.0f);
+
     smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
-    
-    korgFilter.init(AudioProcessor::getSampleRate());
-    korgFilter.setCutoff(64.0f);
-    
-    moogLadder.init(AudioProcessor::getSampleRate());
-    moogLadder.setCutoff(64.0f);
+
 }
 
 void ZedAudioProcessor::releaseResources()
@@ -214,8 +223,9 @@ bool ZedAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) cons
 
 void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    filter.setFilterType(3.0f);
-    
+    svfL.setFilterType(3.0f);
+    svfR.setFilterType(3.0f);
+
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -226,8 +236,11 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     auto* lChannelData = buffer.getWritePointer(0);
     auto* rChannelData = buffer.getWritePointer(1);
 
-    filter.setDrive(*inputDriveParameter);
-    korgFilter.setDrive(*inputDriveParameter);
+    svfL.setDrive(*inputDriveParameter);
+    svfR.setDrive(*inputDriveParameter);
+
+    korgFilterL.setDrive(*inputDriveParameter);
+    korgFilterR.setDrive(*inputDriveParameter);
 
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
     
@@ -238,39 +251,47 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     switch(filtermode){
         case 1:
             //LPF
-            filter.setFilterType(3.0f); //3 = lp
-            korgFilter.setFilterType(0); //0 = lp
+            svfL.setFilterType(3.0f); //3 = lp
+            svfR.setFilterType(3.0f); //3 = lp
+            korgFilterL.setFilterType(0); //0 = lp
+            korgFilterR.setFilterType(0); //0 = lp
             filtermodeAtom.store(1);
             break;
         case 2:
             //HPF
-            filter.setFilterType(1.0f); //1 = hp
-            korgFilter.setFilterType(1); //1 = hp
+            svfL.setFilterType(1.0f); //1 = hp
+            svfR.setFilterType(1.0f); //1 = hp
+            korgFilterL.setFilterType(1); //1 = hp
+            korgFilterR.setFilterType(1); //1 = hp
             filtermodeAtom.store(2);
             break;
         case 3:
             //BPF
             if(filtertype == SVFMode){
-                filter.setFilterType(2.0f); //2 = bp
+                svfL.setFilterType(2.0f); //2 = bp
+                svfR.setFilterType(2.0f); //2 = bp
                 filtermodeAtom.store(3);
             }
             else{
                 //kick it back to LPF if not an SVF
                 Value lateMixParamVal = parameters.getParameterAsValue("lpfmode");
                 lateMixParamVal.setValue(1);
-                filter.setFilterType(3.0f); //3 = lp
+                svfL.setFilterType(3.0f); //3 = lp
+                svfR.setFilterType(3.0f); //3 = lp
                 filtermodeAtom.store(1);
             }
             break;
         case 4:
             //BRF
             if(filtertype == SVFMode){
-                filter.setFilterType(4.0f); //4 = br/notch
+                svfL.setFilterType(4.0f); //4 = br/notch
+                svfR.setFilterType(4.0f); //4 = br/notch
                 filtermodeAtom.store(4);
             }
             else{
                 //kick it back to LPF if not an SVF
-                filter.setFilterType(3.0f); //3 = lp
+                svfL.setFilterType(3.0f); //3 = lp
+                svfR.setFilterType(3.0f); //3 = lp
                 filtermodeAtom.store(1);
             }
             break;
@@ -280,25 +301,38 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         
-        filter.setCutoff(smoothCutoff);
-        korgFilter.setCutoff(smoothCutoff);
-        moogLadder.setCutoff(smoothCutoff);
+        svfL.setCutoff(smoothCutoff);
+        korgFilterL.setCutoff(smoothCutoff);
+        moogLadderL.setCutoff(smoothCutoff);
 
-        filter.setQ(*resParameter);
-        korgFilter.setResonance(*resParameter);
-        moogLadder.setResonance(*resParameter);
-
-        float out = 0.0f;
+        svfR.setCutoff(smoothCutoff);
+        korgFilterR.setCutoff(smoothCutoff);
+        moogLadderR.setCutoff(smoothCutoff);
         
+        svfL.setQ(*resParameter);
+        korgFilterL.setResonance(*resParameter);
+        moogLadderL.setResonance(*resParameter);
+
+        svfR.setQ(*resParameter);
+        korgFilterR.setResonance(*resParameter);
+        moogLadderR.setResonance(*resParameter);
+
+
+        float outL = 0.0f;
+        float outR = 0.0f;
+
         switch(filtertype){
             case SVFMode: //state variable filter mode
-                out = filter.dsp(lChannelData[j]);
+                outL = svfL.dsp(lChannelData[j]);
+                outR = svfR.dsp(rChannelData[j]);
                 break;
             case SKMode: //sallen key mode
-                out = korgFilter.dsp(lChannelData[j]);
+                outL = korgFilterL.dsp(lChannelData[j]);
+                outR = korgFilterR.dsp(rChannelData[j]);
                 break;
             case TLFMode: //transistor ladder mode
-                out = moogLadder.dsp(lChannelData[j]);
+                outL = moogLadderL.dsp(lChannelData[j]);
+                outR = moogLadderR.dsp(rChannelData[j]);
             case DLFMode:
                 break;
             default:
@@ -306,8 +340,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 //out = filter.dsp(lChannelData[j]);
         };
 
-        lChannelData[j] = out;
-        rChannelData[j] = out;
+        lChannelData[j] = outL;
+        rChannelData[j] = outR;
     }
 }
 

@@ -90,9 +90,15 @@ private:
     std::atomic<float>* tlfTypeParameter = nullptr; //transistor ladder
     std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
 
-    ZDSVF filter;
-    ZDSKmm korgFilter;
-    ZDML moogLadder;
+    ZDSVF svfL;
+    ZDSVF svfR;
+
+    ZDSKmm korgFilterL;
+    ZDSKmm korgFilterR;
+
+    ZDML moogLadderL;
+    ZDML moogLadderR;
+
     OnePoleLP smootherCutoff;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)
