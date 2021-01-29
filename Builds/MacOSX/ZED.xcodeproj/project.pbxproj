@@ -322,6 +322,13 @@
 			path = ../../Source/jdsplib/DiffusionDelayLin.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		5A9F8E5ECEC0AFE94E580CEA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDDL.h;
+			path = ../../Source/jdsplib/ZDDL.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		5AE842DA962B17419CF5CC43 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -658,6 +665,13 @@
 			path = "~/JUCE/modules/juce_gui_extra";
 			sourceTree = "<absolute>";
 		};
+		D8FC5939F164FEC44B0D807D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ZDOnePoleEx.h;
+			path = ../../Source/jdsplib/ZDOnePoleEx.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D9E78A5506757D8C1D2402E9 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -759,8 +773,10 @@
 				3BEC1F51DC6129705488BE3E,
 				C704C2664E5D606ECEBEC8D2,
 				56F66B769915BFBC32C83264,
+				5A9F8E5ECEC0AFE94E580CEA,
 				9BF7FBF952A2A4FF933BA3D0,
 				73D63F49E14BD960DFD9943D,
+				D8FC5939F164FEC44B0D807D,
 				C584ADE29AE9160579F1FB1E,
 				44E68A41AE1D0776DA025673,
 				D31824E928561B0CCB9EBD16,

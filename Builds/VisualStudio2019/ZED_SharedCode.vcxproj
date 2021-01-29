@@ -2040,8 +2040,10 @@
     <ClInclude Include="..\..\Source\jdsplib\RevMini.h"/>
     <ClInclude Include="..\..\Source\jdsplib\RevMZ.h"/>
     <ClInclude Include="..\..\Source\jdsplib\voice.h"/>
+    <ClInclude Include="..\..\Source\jdsplib\ZDDL.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDML.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDOnePole.h"/>
+    <ClInclude Include="..\..\Source\jdsplib\ZDOnePoleEx.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSK.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSKHPF.h"/>
     <ClInclude Include="..\..\Source\jdsplib\ZDSKmm.h"/>
