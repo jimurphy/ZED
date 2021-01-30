@@ -16,6 +16,12 @@
 
 class ZDML{
 public:
+    
+    ZDML(){
+    }
+    
+    ~ZDML(){};
+
     inline void init(float samplerate){
         sr = samplerate;
         //init all four

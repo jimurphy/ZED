@@ -16,6 +16,7 @@
 #include "ZDSKmm.h"
 #include "ZDOnePole.h"
 #include "ZDML.h"
+#include "ZDDL.h"
 
 //==============================================================================
 /**
@@ -98,6 +99,9 @@ private:
 
     ZDML moogLadderL;
     ZDML moogLadderR;
+    
+    ZDDL diodeLadderL;
+    ZDDL diodeLadderR;
 
     OnePoleLP smootherCutoff;
 

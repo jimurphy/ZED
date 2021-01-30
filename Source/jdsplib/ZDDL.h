@@ -13,11 +13,16 @@
 #pragma once
 
 #pragma once
-#include "ZDOnePole.h"
+#include "ZDOnePoleEx.h"
 #include "DSPMath.h"
 
-class ZDML{
+class ZDDL{
 public:
+    ZDDL(){
+    }
+    
+    ~ZDDL(){};
+
     inline void init(float samplerate){
         sr = samplerate;
         //init all four
@@ -45,52 +50,83 @@ public:
         lpf4.delta = 0.0f;
         lpf4.epsilon = 0.0f;
         lpf4.setFeedback(0.0f);
+        
+        updateFilter();
     }
     
     //expects cutoff 0-127
     inline void setCutoff(float pitch){
         cutoff = p2f(pitch);
-        updateFilters();
+        updateFilter();
     }
     
     inline void setResonance(float res){
-        k = map(res, 0.0f, 1.0f, 0.0f, 4.0f); //TODO: is this the right map range?
+        k = map(res, 0.0f, 1.0f, 0.0f, 30.0f);
+        updateFilter();
     }
     
-    inline void updateFilters(){
-        filter1.setCutoff(cutoff);
-        filter2.setCutoff(cutoff);
-        filter3.setCutoff(cutoff);
-        filter4.setCutoff(cutoff);
-    }
-    
-    inline float dsp(float ip){
+    inline void updateFilter(){
         // calculate G
         float wd = 2.0f * MathConstants<float>::pi * cutoff;
         float T = 1.0f/sr;
         float wa = (2.0f/T)*tan(wd*T/2.0f);
         float g = wa * T / 2.0f;
-        float G = g * g * g;
+
+        float G4 = (0.5f * g) / (1.0f + g);
+        float G3 = (0.5f * g) / (1.0f + g - (0.5f*g*G4));
+        float G2 = (0.5f * g) / (1.0f + g - (0.5f*g*G3));
+        float G1 = g / (1.0f + g - (g*G2));
+        gamma = G4 * G3 * G2 * G1;
+        sg1 = G4 * G3 * G2;
+        sg2 = G4 * G3;
+        sg3 = G4;
+        sg4 = 1.0f;
         
-        float S = g * g * g * filter1.getZ() +
-                  g * g * filter2.getZ() +
-                  g * filter3.getZ() +
-                  filter4.getZ();
+        lpf1.ff = g/(1.0f + g);
+        lpf2.ff = g/(1.0f + g);
+        lpf3.ff = g/(1.0f + g);
+        lpf4.ff = g/(1.0f + g);
         
-        float u = (ip - k*S)/(1.0f + k*G);
-        u = fasttanh(u * 1.0f);
-        float filterOut = filter4.dsp(filter3.dsp(filter2.dsp(filter1.dsp(u))));
-        return filterOut;
+        lpf1.fb = 1.0f/(1.0f + g - (g*G2));
+        lpf2.fb = 1.0f/(1.0f + g - (0.5f*g*G3));
+        lpf3.fb = 1.0f/(1.0f + g - (0.5f*g*G4));
+        lpf4.fb = 1.0f/(1.0f + g);
+        
+        lpf1.gamma = 1.0f + G1*G2;
+        lpf2.gamma = 1.0f + G2*G3;
+        lpf3.gamma = 1.0f + G3*G4;
+        
+        lpf1.delta = g;
+        lpf2.delta = 0.5f * g;
+        lpf3.delta = 0.5f * g;
+        
+        lpf1.epsilon = G2;
+        lpf2.epsilon = G3;
+        lpf3.epsilon = G4;
+    }
+    
+    inline float dsp(float ip){
+        lpf3.setFeedback(lpf4.getFeedbackOutput());
+        lpf2.setFeedback(lpf3.getFeedbackOutput());
+        lpf1.setFeedback(lpf2.getFeedbackOutput());
+        
+        float sigma =  (sg1 * lpf1.getFeedbackOutput()) +
+                       (sg2 * lpf2.getFeedbackOutput()) +
+                       (sg3 * lpf3.getFeedbackOutput()) +
+                       (sg4 * lpf4.getFeedbackOutput());
+        
+        float un = (ip - k*sigma)/(1 + k * gamma);
+        return(lpf4.dsp(lpf3.dsp(lpf2.dsp(lpf1.dsp(un)))));
     }
 
 
 private:
     enum{LPF1}; //for child members
 
-    ZDOnePole lpf1;
-    ZDOnePole lpf2;
-    ZDOnePole lpf3;
-    ZDOnePole lpf4;
+    ZDOnePoleEx lpf1;
+    ZDOnePoleEx lpf2;
+    ZDOnePoleEx lpf3;
+    ZDOnePoleEx lpf4;
     
     float gamma = 0.0f;
     float sg1 = 0.0f;

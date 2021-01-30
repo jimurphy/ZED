@@ -186,6 +186,12 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     moogLadderL.setCutoff(64.0f);
     moogLadderR.setCutoff(64.0f);
+    
+    diodeLadderL.init(AudioProcessor::getSampleRate());
+    diodeLadderR.init(AudioProcessor::getSampleRate());
+
+    diodeLadderL.setCutoff(64.0f);
+    diodeLadderR.setCutoff(64.0f);
 
     smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
 
@@ -304,19 +310,22 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         svfL.setCutoff(smoothCutoff);
         korgFilterL.setCutoff(smoothCutoff);
         moogLadderL.setCutoff(smoothCutoff);
+        diodeLadderL.setCutoff(smoothCutoff);
 
         svfR.setCutoff(smoothCutoff);
         korgFilterR.setCutoff(smoothCutoff);
         moogLadderR.setCutoff(smoothCutoff);
-        
+        diodeLadderR.setCutoff(smoothCutoff);
+
         svfL.setQ(*resParameter);
         korgFilterL.setResonance(*resParameter);
         moogLadderL.setResonance(*resParameter);
+        diodeLadderL.setResonance(*resParameter);
 
         svfR.setQ(*resParameter);
         korgFilterR.setResonance(*resParameter);
         moogLadderR.setResonance(*resParameter);
-
+        diodeLadderR.setResonance(*resParameter);
 
         float outL = 0.0f;
         float outR = 0.0f;
@@ -333,7 +342,10 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             case TLFMode: //transistor ladder mode
                 outL = moogLadderL.dsp(lChannelData[j]);
                 outR = moogLadderR.dsp(rChannelData[j]);
+                break;
             case DLFMode:
+                outL = diodeLadderL.dsp(lChannelData[j]);
+                outR = diodeLadderR.dsp(rChannelData[j]);
                 break;
             default:
                 break;
