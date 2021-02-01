@@ -31,15 +31,15 @@ public:
         lpf3.filterType = LPF1;
         lpf4.filterType = LPF1;
         
-        lpf1.init(44100);
-        lpf2.init(44100);
-        lpf3.init(44100);
-        lpf4.init(44100);
+        lpf1.init(44100.0f);
+        lpf2.init(44100.0f);
+        lpf3.init(44100.0f);
+        lpf4.init(44100.0f);
         
-        lpf1.setFeedback(0.0);
-        lpf2.setFeedback(0.0);
-        lpf3.setFeedback(0.0);
-        lpf4.setFeedback(0.0);
+        lpf1.setFeedback(0.0f);
+        lpf2.setFeedback(0.0f);
+        lpf3.setFeedback(0.0f);
+        lpf4.setFeedback(0.0f);
         
         lpf1.a0 = 1.0f;
         lpf2.a0 = 0.5f;
@@ -61,7 +61,7 @@ public:
     }
     
     inline void setResonance(float res){
-        k = map(res, 0.0f, 1.0f, 0.0f, 30.0f);
+        k = map(res, 0.0f, 1.0f, 0.0f, 17.0f);
         updateFilter();
     }
     
@@ -114,10 +114,8 @@ public:
                        (sg2 * lpf2.getFeedbackOutput()) +
                        (sg3 * lpf3.getFeedbackOutput()) +
                        (sg4 * lpf4.getFeedbackOutput());
-        
-        ip = tanh(1.0*ip);
-        
-        float un = (ip - k*sigma)/(1 + k * gamma);
+                
+        float un = tanh((ip - k*sigma)/(1 + k * gamma));
         return(lpf4.dsp(lpf3.dsp(lpf2.dsp(lpf1.dsp(un)))));
     }
 

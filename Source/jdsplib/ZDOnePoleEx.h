@@ -37,7 +37,6 @@ public:
 
     inline void init(float samplerate){
         sr = samplerate;
-        updateFilter();
     }
     
     inline float getFeedbackOutput(){
@@ -50,23 +49,15 @@ public:
     
     inline void setCutoff(float co){
         cutoff = co;
-        updateFilter();
     }
 
-    inline void updateFilter(){
-        float wd = 2.0f * MathConstants<float>::pi * cutoff;
-        float T = 1.0f/sr;
-        float wa = (2/T)*tan(wd*T/2);
-        float g  = wa*T/2;
-        ff = g/(1.0 + g);
-    }
-    
     inline float dsp(float input){
+        
         float xn = (input*gamma + feedback + epsilon*getFeedbackOutput());
+        
+        float vn = (a0 * xn - z)*ff;
 
-        float vn = (a0 * input - z)*ff;
-
-        float lpf = tanh(vn + z);
+        float lpf = tanh((vn + z) * 1.0f);
 
         z = vn + lpf;
 
@@ -85,7 +76,7 @@ public:
     }
     
 private:
-    float sr = 44100;
+    float sr = 44100.0f;
     float cutoff = 0.0f;
     float z = 0.0f;
 };

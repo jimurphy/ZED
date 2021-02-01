@@ -344,8 +344,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 outR = moogLadderR.dsp(rChannelData[j]);
                 break;
             case DLFMode:
-                outL = diodeLadderL.dsp(lChannelData[j]) * 7.0f;
-                outR = diodeLadderR.dsp(rChannelData[j]) * 7.0f;
+                outL = diodeLadderL.dsp(lChannelData[j]) * 1.0f;
+                outR = diodeLadderR.dsp(rChannelData[j]) * 1.0f;
                 break;
             default:
                 break;
