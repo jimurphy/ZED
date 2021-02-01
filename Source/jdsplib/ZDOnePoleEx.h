@@ -66,7 +66,7 @@ public:
 
         float vn = (a0 * input - z)*ff;
 
-        float lpf = vn + z;
+        float lpf = tanh(vn + z);
 
         z = vn + lpf;
 
