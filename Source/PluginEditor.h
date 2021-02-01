@@ -97,6 +97,7 @@ private:
     //LABELS
     Label freqLabel;
     Label resLabel;
+    Label driveLabel;
 
     //BUTTONS
     TextButton lpfButton;

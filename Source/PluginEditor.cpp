@@ -62,6 +62,10 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     driveSlider.setColour(juce::Slider::trackColourId, sliderColour);
     driveSlider.setValue(1.0f);
     addAndMakeVisible(&driveSlider);
+    driveSlider.onValueChange = [this] {
+        std::string driveLabelString = "DRIVE: " + std::to_string(driveSlider.getValue()).substr(0,3);
+        driveLabel.setText(driveLabelString, dontSendNotification);
+    };
     driveAttachment.reset (new SliderAttachment (valueTreeState, "drive", driveSlider));
 
     //buttons
@@ -150,6 +154,13 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     resLabel.setColour(Label::textColourId, backgroundColour);
     resLabel.setJustificationType(Justification::left);
     
+    addAndMakeVisible(driveLabel);
+    driveLabel.setFont(labelFont);
+    driveLabel.setBorderSize(BorderSize< int >(0));
+    driveLabel.setText("DRIVE: 0.1", dontSendNotification);
+    driveLabel.setColour(Label::textColourId, backgroundColour);
+    driveLabel.setJustificationType(Justification::left);
+
     startTimerHz(60);
 }
 
@@ -197,6 +208,7 @@ void ZedAudioProcessorEditor::resized()
 
     freqLabel.setBounds(225, 23, 50, 10);
     resLabel.setBounds(225, 33, 50, 10);
+    driveLabel.setBounds(225, 43, 50, 10);
 }
 
 void ZedAudioProcessorEditor::timerCallback()

@@ -26,7 +26,6 @@ FilterSpline::~FilterSpline()
 
 void FilterSpline::paint (juce::Graphics& g)
 {
-
     g.setGradientFill(juce::ColourGradient(backgroundColourGradient1, 0, 0, backgroundColourGradient2, getLocalBounds().getWidth(), getLocalBounds().getHeight(), false));
     
     g.fillRect (getLocalBounds()); //Draw rect the size of main frame to fill w/ gradient
