@@ -2478,6 +2478,9 @@
     <ClInclude Include="..\..\Source\jdsplib\CombFilterFF.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\jdsplib\DCBlocker.h">
+      <Filter>ZED\Source\jdsplib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\jdsplib\DelayLin.h">
       <Filter>ZED\Source\jdsplib</Filter>
     </ClInclude>

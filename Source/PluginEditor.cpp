@@ -230,13 +230,13 @@ void ZedAudioProcessorEditor::timerCallback()
             brfButton.setEnabled(false);
             break;
         case TLFMode:
-            lpfButton.setEnabled(false);
+            lpfButton.setEnabled(true);
             hpfButton.setEnabled(false);
             bpfButton.setEnabled(false);
             brfButton.setEnabled(false);
             break;
         case DLFMode:
-            lpfButton.setEnabled(false);
+            lpfButton.setEnabled(true);
             hpfButton.setEnabled(false);
             bpfButton.setEnabled(false);
             brfButton.setEnabled(false);

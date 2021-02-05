@@ -17,6 +17,7 @@
 #include "ZDOnePole.h"
 #include "ZDML.h"
 #include "ZDDL.h"
+#include "DCBlocker.h"
 
 //==============================================================================
 /**
@@ -104,6 +105,8 @@ private:
     ZDDL diodeLadderR;
 
     OnePoleLP smootherCutoff;
+    DCBlocker dcblocker1;
+    DCBlocker dcblocker2;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessor)
 };

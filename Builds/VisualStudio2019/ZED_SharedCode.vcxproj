@@ -2030,6 +2030,7 @@
     <ClInclude Include="..\..\Source\jdsplib\CombFilterFB.h"/>
     <ClInclude Include="..\..\Source\jdsplib\CombFilterFBLP.h"/>
     <ClInclude Include="..\..\Source\jdsplib\CombFilterFF.h"/>
+    <ClInclude Include="..\..\Source\jdsplib\DCBlocker.h"/>
     <ClInclude Include="..\..\Source\jdsplib\DelayLin.h"/>
     <ClInclude Include="..\..\Source\jdsplib\DiffusionDelayLin.h"/>
     <ClInclude Include="..\..\Source\jdsplib\DSPMath.h"/>

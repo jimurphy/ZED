@@ -12,6 +12,7 @@
         <FILE id="W6CZp1" name="CombFilterFBLP.h" compile="0" resource="0"
               file="Source/jdsplib/CombFilterFBLP.h"/>
         <FILE id="xoCV6h" name="CombFilterFF.h" compile="0" resource="0" file="Source/jdsplib/CombFilterFF.h"/>
+        <FILE id="A9Zb5N" name="DCBlocker.h" compile="0" resource="0" file="Source/jdsplib/DCBlocker.h"/>
         <FILE id="IVAldU" name="DelayLin.h" compile="0" resource="0" file="Source/jdsplib/DelayLin.h"/>
         <FILE id="g4TMAf" name="DiffusionDelayLin.h" compile="0" resource="0"
               file="Source/jdsplib/DiffusionDelayLin.h"/>
