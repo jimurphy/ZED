@@ -194,7 +194,7 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     diodeLadderR.setCutoff(64.0f);
 
     smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
-
+    smootherRes.setCutoff(4.0f, AudioProcessor::getSampleRate());
 }
 
 void ZedAudioProcessor::releaseResources()
@@ -306,7 +306,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     for (int j=0;j<buffer.getNumSamples();++j){
         
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
-        
+        float smoothRes = smootherRes.dsp(*resParameter);
+
         svfL.setCutoff(smoothCutoff);
         korgFilterL.setCutoff(smoothCutoff);
         moogLadderL.setCutoff(smoothCutoff);
@@ -317,15 +318,15 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         moogLadderR.setCutoff(smoothCutoff);
         diodeLadderR.setCutoff(smoothCutoff);
 
-        svfL.setQ(*resParameter);
-        korgFilterL.setResonance(*resParameter);
-        moogLadderL.setResonance(*resParameter);
-        diodeLadderL.setResonance(*resParameter);
+        svfL.setQ(smoothRes);
+        korgFilterL.setResonance(smoothRes);
+        moogLadderL.setResonance(smoothRes);
+        diodeLadderL.setResonance(smoothRes);
 
-        svfR.setQ(*resParameter);
-        korgFilterR.setResonance(*resParameter);
-        moogLadderR.setResonance(*resParameter);
-        diodeLadderR.setResonance(*resParameter);
+        svfR.setQ(smoothRes);
+        korgFilterR.setResonance(smoothRes);
+        moogLadderR.setResonance(smoothRes);
+        diodeLadderR.setResonance(smoothRes);
 
         float outL = 0.0f;
         float outR = 0.0f;

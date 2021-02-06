@@ -105,6 +105,8 @@ private:
     ZDDL diodeLadderR;
 
     OnePoleLP smootherCutoff;
+    OnePoleLP smootherRes;
+
     DCBlocker dcblocker1;
     DCBlocker dcblocker2;
 
