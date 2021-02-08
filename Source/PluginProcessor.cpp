@@ -333,8 +333,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
         switch(filtertype){
             case SVFMode: //state variable filter mode
-                outL = dcblocker1.dsp(svfL.dsp(lChannelData[j]));
-                outR = dcblocker2.dsp(svfR.dsp(rChannelData[j]));
+                outL = svfL.dsp(lChannelData[j]);
+                outR = svfR.dsp(rChannelData[j]);
                 break;
             case SKMode: //sallen key mode
                 outL = korgFilterL.dsp(lChannelData[j]);

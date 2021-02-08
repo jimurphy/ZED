@@ -81,9 +81,9 @@ public:
         
         hp = (input - (2.0*r+g)*z1-z2)/(1.0+2.0*r*g+g*g);
         bp = g*hp+z1;
-        bp = fasttanh(1.0*bp + 1e-18); //Nonlinear processing from pg353 of pirkle plugin book. DNC for self-osc (via M.Z.)
+        bp = tanh(1.0*bp); //Nonlinear processing from pg353 of pirkle plugin book.
         lp = g*bp+z2;
-        lp = fasttanh(1.0*lp + 1e-18); //Martijn suggests adding second tanh saturator to second integrator
+        lp = tanh(1.0*lp); //Martijn suggests adding second tanh saturator to second integrator
         br = hp + lp;
         
         z1 = g*hp + bp;

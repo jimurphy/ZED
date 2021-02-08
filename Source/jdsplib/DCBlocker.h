@@ -18,7 +18,7 @@ public:
     ~DCBlocker(){};
         
     inline float dsp(float i){
-        float y = i - xm1 + 0.8f * ym1;
+        float y = i - xm1 + 0.9 * ym1; //Bigger values = lower freq cutoff (default = 0.995f)
         xm1 = i;
         ym1 = y;
         return y;
