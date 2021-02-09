@@ -132,12 +132,12 @@ void FilterSpline::connectControlPoints(juce::Graphics& g){
     g.strokePath (myPath, PathStrokeType (1.0f));
 }
 
-//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+//Expects cutoff in MIDI range (12-127) and resonance values between 0-1
 void FilterSpline::calculateLowpassControlPoints(float c, float q){
     auto area = getLocalBounds();
     
     float qScale = q / 2.0f;
-    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float cutoffFreqValue = map(c, 12.0f, 127.0f, 0.0f, area.getWidth());
     float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/1.5f, -50.0f); //narrows band
     float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
     
@@ -168,12 +168,12 @@ void FilterSpline::calculateLowpassControlPoints(float c, float q){
     ctrlY[10] = area.getHeight(); //Clamp right
 }
 
-//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+//Expects cutoff in MIDI range (12-127) and resonance values between 0-1
 void FilterSpline::calculateHighpassControlPoints(float c, float q){
     auto area = getLocalBounds();
     
     float qScale = q / 2.0f;
-    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float cutoffFreqValue = map(c, 12.0f, 127.0f, 0.0f, area.getWidth());
     float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/1.5f, -50.0f); //narrows band
     float peakWidth = map(min(q, 1.0f), 0.0f, 1.0f, area.getWidth()/10.0f, 1.0f);
     
@@ -229,13 +229,13 @@ void FilterSpline::calculateHighpassControlPoints(float c, float q){
     ctrlY[10] = area.getHeight()/2.0f;
 }
 
-//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+//Expects cutoff in MIDI range (12-127) and resonance values between 0-1
 void FilterSpline::calculateBandpassControlPoints(float c, float q){
     auto area = getLocalBounds();
     
     float qScale = q / 2.0f;
     
-    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float cutoffFreqValue = map(c, 12.0f, 127.0f, 0.0f, area.getWidth());
     
     float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight()/2.0f, -50.0f); //narrows band
     
@@ -274,13 +274,13 @@ void FilterSpline::calculateBandpassControlPoints(float c, float q){
     ctrlY[10] = area.getHeight();
 }
 
-//Expects cutoff in MIDI range (0-127) and resonance values between 0-1
+//Expects cutoff in MIDI range (12-127) and resonance values between 0-1
 void FilterSpline::calculateBandrejectControlPoints(float c, float q){
     auto area = getLocalBounds();
     
     float qScale = q / 2.0f;
     
-    float cutoffFreqValue = map(c, 0.0f, 127.0f, 0.0f, area.getWidth());
+    float cutoffFreqValue = map(c, 12.0f, 127.0f, 0.0f, area.getWidth());
     
     float resPeakValue = map(min(qScale, 1.0f), 0.0f, 1.0f, area.getHeight(), area.getHeight() * 2.0f); //narrows band
     
@@ -329,6 +329,6 @@ void FilterSpline::mouseDrag (const MouseEvent& event)
     float mouseXDragPos = event.getPosition().x;
     float mouseYDragPos = event.getPosition().y;
 
-    cutoffParamValue.setValue(map(mouseXDragPos, 0.0f, area.getWidth(), 0.0f, 127.0f));
+    cutoffParamValue.setValue(map(mouseXDragPos, 0.0f, area.getWidth(), 12.0f, 127.0f));
     resParamValue.setValue(map(mouseYDragPos, 0.0f, area.getHeight(), 1.1f, 0.0f));
 }
