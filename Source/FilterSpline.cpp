@@ -35,8 +35,6 @@ void FilterSpline::paint (juce::Graphics& g)
 
 void FilterSpline::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
 }
 
 void FilterSpline::setMode(int m){
@@ -71,7 +69,8 @@ float FilterSpline::basis3(float u){
 }
 
 void FilterSpline::drawSpline(juce::Graphics& g){
-    
+
+    //Uncomment to draw control points, used for diagnostics
     //drawControlPoints(g);
     //connectControlPoints(g);
     
