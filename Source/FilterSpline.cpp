@@ -15,9 +15,11 @@
 //==============================================================================
 FilterSpline::FilterSpline(AudioProcessorValueTreeState& vts) : valueTreeState (vts)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+    std::atomic<float>* cutoffAtomic = vts.getRawParameterValue("cutoff");
+    std::atomic<float>* resonanceAtomic = vts.getRawParameterValue("resonance");
 
+    setPitch(cutoffAtomic->load());
+    setRes(resonanceAtomic->load());
 }
 
 FilterSpline::~FilterSpline()
