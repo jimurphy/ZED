@@ -248,6 +248,12 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     korgFilterL.setDrive(*inputDriveParameter);
     korgFilterR.setDrive(*inputDriveParameter);
 
+    diodeLadderL.setDrive(*inputDriveParameter);
+    diodeLadderR.setDrive(*inputDriveParameter);
+    
+    moogLadderL.setDrive(*inputDriveParameter);
+    moogLadderR.setDrive(*inputDriveParameter);
+
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
     
     int filtertype = (*svfTypeParameter * 0) + (*skTypeParameter * 1) + (*tlfTypeParameter * 2) + (*dlfTypeParameter * 3);

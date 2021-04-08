@@ -65,6 +65,10 @@ public:
         updateFilter();
     }
     
+    inline void setDrive(float d){
+        driveGain = d;
+    }
+
     inline void updateFilter(){
         // calculate G
         float wd = 2.0f * MathConstants<float>::pi * cutoff;
@@ -106,6 +110,8 @@ public:
     }
     
     inline float dsp(float ip){
+        ip = fasttanh(ip * driveGain);
+
         lpf3.setFeedback(lpf4.getFeedbackOutput());
         lpf2.setFeedback(lpf3.getFeedbackOutput());
         lpf1.setFeedback(lpf2.getFeedbackOutput());
@@ -137,4 +143,5 @@ private:
     float sr = 44100.0f;
     float k = 0.0f; //Resonance
     float cutoff = 0.0f;
+    float driveGain = 0.0f;
 };

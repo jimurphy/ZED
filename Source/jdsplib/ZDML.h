@@ -46,6 +46,10 @@ public:
         k = map(res, 0.0f, 1.0f, 0.0f, 4.0f); //TODO: is this the right map range?
     }
     
+    inline void setDrive(float d){
+        driveGain = d;
+    }
+    
     inline void updateFilters(){
         filter1.setCutoff(cutoff);
         filter2.setCutoff(cutoff);
@@ -54,6 +58,8 @@ public:
     }
     
     inline float dsp(float ip){
+        ip = fasttanh(ip * driveGain);
+
         // calculate G
         float wd = 2.0f * MathConstants<float>::pi * cutoff;
         float T = 1.0f/sr;
@@ -84,4 +90,5 @@ private:
     float sr = 44100.0f;
     float k = 0.0f; //Resonance
     float cutoff = 0.0f;
+    float driveGain = 0.0f;
 };
