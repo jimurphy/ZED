@@ -356,16 +356,16 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
                 outR = svfR.dsp(rChannelData[j]);
                 break;
             case SKMode: //sallen key mode
-                outL = korgFilterL.dsp(lChannelData[j]);
-                outR = korgFilterR.dsp(rChannelData[j]);
+                outL = korgFilterL.dsp(lChannelData[j] * 2.0f);
+                outR = korgFilterR.dsp(rChannelData[j] * 2.0f);
                 break;
             case TLFMode: //transistor ladder mode
-                outL = moogLadderL.dsp(lChannelData[j]);
-                outR = moogLadderR.dsp(rChannelData[j]);
+                outL = moogLadderL.dsp(lChannelData[j]) * 3.25f;
+                outR = moogLadderR.dsp(rChannelData[j]) * 3.25f;
                 break;
             case DLFMode:
-                outL = diodeLadderL.dsp(lChannelData[j]) * 1.0f;
-                outR = diodeLadderR.dsp(rChannelData[j]) * 1.0f;
+                outL = diodeLadderL.dsp(lChannelData[j]) * 10.0f;
+                outR = diodeLadderR.dsp(rChannelData[j]) * 10.0f;
                 break;
             default:
                 break;
