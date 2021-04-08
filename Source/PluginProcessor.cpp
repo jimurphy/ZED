@@ -265,11 +265,21 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             break;
         case 2:
             //HPF
-            svfL.setFilterType(1.0f); //1 = hp
-            svfR.setFilterType(1.0f); //1 = hp
-            korgFilterL.setFilterType(1); //1 = hp
-            korgFilterR.setFilterType(1); //1 = hp
-            filtermodeAtom.store(2);
+            if(filtertype == SVFMode || filtertype == SKMode){
+                svfL.setFilterType(1.0f); //1 = hp
+                svfR.setFilterType(1.0f); //1 = hp
+                korgFilterL.setFilterType(1); //1 = hp
+                korgFilterR.setFilterType(1); //1 = hp
+                filtermodeAtom.store(2);
+            }
+            else{
+                //kick it back to LPF if not an SVF or SKF
+                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
+                lpfParamVal.setValue(1);
+                svfL.setFilterType(3.0f); //3 = lp
+                svfR.setFilterType(3.0f); //3 = lp
+                filtermodeAtom.store(1);
+            }
             break;
         case 3:
             //BPF
@@ -280,8 +290,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             }
             else{
                 //kick it back to LPF if not an SVF
-                Value lateMixParamVal = parameters.getParameterAsValue("lpfmode");
-                lateMixParamVal.setValue(1);
+                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
+                lpfParamVal.setValue(1);
                 svfL.setFilterType(3.0f); //3 = lp
                 svfR.setFilterType(3.0f); //3 = lp
                 filtermodeAtom.store(1);
@@ -296,6 +306,9 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             }
             else{
                 //kick it back to LPF if not an SVF
+                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
+                lpfParamVal.setValue(1);
+
                 svfL.setFilterType(3.0f); //3 = lp
                 svfR.setFilterType(3.0f); //3 = lp
                 filtermodeAtom.store(1);
