@@ -36,7 +36,7 @@ std::make_unique<AudioParameterFloat> ("cutoff",        // parameterID
 
 std::make_unique<AudioParameterFloat> ("resonance",        // parameterID
                                        "Resonance",        // parameter name
-                                       NormalisableRange<float> (0.0f, 1.1f, 0.01f),
+                                       NormalisableRange<float> (0.01f, 1.1f, 0.01f),
                                        0.7f //default val
                                        ),
 

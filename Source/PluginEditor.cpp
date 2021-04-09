@@ -140,26 +140,26 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     //labels
     auto labelFont = Font(10.0);
 
-    addAndMakeVisible(freqLabel);
     freqLabel.setFont(labelFont);
     freqLabel.setBorderSize(BorderSize< int >(0));
-    freqLabel.setText("220.0 HZ", dontSendNotification);
+    //freqLabel.setText("220.0 HZ", dontSendNotification);
     freqLabel.setColour(Label::textColourId, backgroundColour);
     freqLabel.setJustificationType(Justification::left);
-    
-    addAndMakeVisible(resLabel);
+    addAndMakeVisible(freqLabel);
+
     resLabel.setFont(labelFont);
     resLabel.setBorderSize(BorderSize< int >(0));
-    resLabel.setText("RES: 0.1", dontSendNotification);
+    //resLabel.setText("RES: 0.1", dontSendNotification);
     resLabel.setColour(Label::textColourId, backgroundColour);
     resLabel.setJustificationType(Justification::left);
-    
-    addAndMakeVisible(driveLabel);
+    addAndMakeVisible(resLabel);
+
     driveLabel.setFont(labelFont);
     driveLabel.setBorderSize(BorderSize< int >(0));
-    driveLabel.setText("DRIVE: 0.1", dontSendNotification);
+    driveLabel.setText("DRIVE: 1.0", dontSendNotification);
     driveLabel.setColour(Label::textColourId, backgroundColour);
     driveLabel.setJustificationType(Justification::left);
+    addAndMakeVisible(driveLabel);
 
     startTimerHz(60);
 }
