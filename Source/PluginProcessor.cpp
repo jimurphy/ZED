@@ -338,14 +338,14 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         diodeLadderR.setCutoff(smoothCutoff);
 
         svfL.setQ(smoothRes);
-        korgFilterL.setResonance(smoothRes);
-        moogLadderL.setResonance(smoothRes);
-        diodeLadderL.setResonance(smoothRes);
+        korgFilterL.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 0.9f));
+        moogLadderL.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 1.05f));
+        diodeLadderL.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 1.125f));
 
         svfR.setQ(smoothRes);
-        korgFilterR.setResonance(smoothRes);
-        moogLadderR.setResonance(smoothRes);
-        diodeLadderR.setResonance(smoothRes);
+        korgFilterR.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 0.9f));
+        moogLadderR.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 1.05f));
+        diodeLadderR.setResonance(map(smoothRes, 0.0f, 1.1f, 0.0f, 1.125f));
 
         float outL = 0.0f;
         float outR = 0.0f;

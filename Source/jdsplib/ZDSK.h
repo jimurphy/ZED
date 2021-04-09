@@ -75,9 +75,9 @@ public:
                 
         //Bipolar shaping
         if(u >= 0.0f)
-            u = tanh(saturationpos * u);
+            u = tanh(saturationpos * u  + 1e-18);
         else
-            u = tanh(saturationneg * u);
+            u = tanh(saturationneg * u  + 1e-18);
             
         float y = k * lpfOP2.dsp(u);
         y = hpfOP.dsp(y);

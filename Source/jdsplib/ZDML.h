@@ -73,7 +73,7 @@ public:
                   filter4.getZ();
         
         float u = (ip - k*S)/(1.0f + k*G);
-        u = fasttanh(u * 1.0f);
+        u = fasttanh(u * 1.0f  + 1e-18);
         float filterOut = filter4.dsp(filter3.dsp(filter2.dsp(filter1.dsp(u))));
         return filterOut;        
     }

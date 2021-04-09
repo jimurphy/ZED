@@ -80,9 +80,9 @@ public:
 
         //Bipolar shaping
         if(y >= 0.0f)
-            y = tanh(saturationpos * y);
+            y = tanh(saturationpos * y  + 1e-18);
         else
-            y = tanh(saturationneg * y);
+            y = tanh(saturationneg * y  + 1e-18);
             
         y = lpfOP1.dsp(hpfOP2.dsp(y));
         

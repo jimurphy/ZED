@@ -18,6 +18,7 @@
 #include "ZDML.h"
 #include "ZDDL.h"
 #include "DCBlocker.h"
+#include "DSPMath.h"
 
 //==============================================================================
 /**

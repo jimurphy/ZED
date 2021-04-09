@@ -121,7 +121,7 @@ public:
                        (sg3 * lpf3.getFeedbackOutput()) +
                        (sg4 * lpf4.getFeedbackOutput());
                 
-        float un = tanh((ip - k*sigma)/(1 + k * gamma));
+        float un = tanh((ip - k*sigma)/(1 + k * gamma)  + 1e-18);
         return(lpf4.dsp(lpf3.dsp(lpf2.dsp(lpf1.dsp(un)))));
     }
 
