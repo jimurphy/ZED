@@ -30,10 +30,10 @@ public:
         filter3.filterType = LPF1;
         filter4.filterType = LPF1;
         
-        filter1.init(44100);
-        filter2.init(44100);
-        filter3.init(44100);
-        filter4.init(44100);
+        filter1.init(sr);
+        filter2.init(sr);
+        filter3.init(sr);
+        filter4.init(sr);
     }
     
     //expects cutoff 0-127

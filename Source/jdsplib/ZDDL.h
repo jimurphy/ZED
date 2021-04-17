@@ -31,10 +31,10 @@ public:
         lpf3.filterType = LPF1;
         lpf4.filterType = LPF1;
         
-        lpf1.init(44100.0f);
-        lpf2.init(44100.0f);
-        lpf3.init(44100.0f);
-        lpf4.init(44100.0f);
+        lpf1.init(sr);
+        lpf2.init(sr);
+        lpf3.init(sr);
+        lpf4.init(sr);
         
         lpf1.setFeedback(0.0f);
         lpf2.setFeedback(0.0f);
