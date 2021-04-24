@@ -34,7 +34,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     addAndMakeVisible(&freqSlider);
     freqSlider.onValueChange = [this] {
         filterWindow.setPitch(freqSlider.getValue());
-        std::string freqLabelString = std::to_string((int)p2f(freqSlider.getValue())).substr(0,4) + " HZ";
+        std::string freqLabelString = std::to_string((int)p2f(freqSlider.getValue())).substr(0,5) + " HZ";
         freqLabel.setText(freqLabelString, dontSendNotification);
     };
     freqAttachment.reset (new SliderAttachment (valueTreeState, "cutoff", freqSlider));
