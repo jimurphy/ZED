@@ -110,7 +110,7 @@ public:
     }
     
     inline float dsp(float ip){
-        ip = fasttanh(ip * driveGain);
+        ip = tanh(ip * driveGain);
 
         lpf3.setFeedback(lpf4.getFeedbackOutput());
         lpf2.setFeedback(lpf3.getFeedbackOutput());

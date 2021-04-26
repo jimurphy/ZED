@@ -58,8 +58,8 @@ public:
     inline void setCutoff(float cutoffin){
         float cutoffFreq = p2f(cutoffin);
         cutoffFreq = cutoffFreq*lfoModValue*envModValue;
-        if(cutoffFreq > sr/3.0){ //avoid > nyquist/3 for stability issues
-            cutoffFreq = sr/3.0;
+        if(cutoffFreq > sr/2.5){ //avoid > nyquist/2.5 for stability issues
+            cutoffFreq = sr/2.5;
         }
         wd = 2 * M_PI * (cutoffFreq);
         t = 1/sr;

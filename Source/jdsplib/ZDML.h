@@ -39,6 +39,10 @@ public:
     //expects cutoff 0-127
     inline void setCutoff(float pitch){
         cutoff = p2f(pitch);
+        
+        if(cutoff > sr/3.5f){ //avoid > nyquist/2.5 for stability issues
+            cutoff = sr/3.5f;
+        }
         updateFilters();
     }
     
@@ -58,7 +62,7 @@ public:
     }
     
     inline float dsp(float ip){
-        ip = fasttanh(ip * driveGain);
+        ip = tanh(ip * driveGain);
 
         // calculate G
         float wd = 2.0f * MathConstants<float>::pi * cutoff;

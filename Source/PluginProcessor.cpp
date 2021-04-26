@@ -30,7 +30,7 @@ std::make_unique<AudioParameterFloat> ("drive",        // parameterID
 
 std::make_unique<AudioParameterFloat> ("cutoff",        // parameterID
                                        "Cutoff",        // parameter name
-                                       NormalisableRange<float> (12.0f, 127.0f, 1.0f),
+                                       NormalisableRange<float> (12.0f, 135.0f, 1.0f),
                                        57.0f //default val
                                        ),
 
