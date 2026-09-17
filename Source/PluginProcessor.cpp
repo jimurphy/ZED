@@ -45,43 +45,43 @@ std::make_unique<AudioParameterFloat> ("lpfmode",         // parameterID
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        1),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("hpfmode",         // parameterID
                                        "HPFMode",         // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        0),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("bpfmode",         // parameterID
                                        "BPFMode",         // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        0),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
                                        "BRF Mode",        // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        0),                 // default value
-    
+
 std::make_unique<AudioParameterFloat> ("svftype",         // parameterID
                                        "SVF Type",        // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        1),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("sktype",          // parameterID
                                        "SK Type",         // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        0),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("tlftype",         // parameterID
                                        "TLF Type",        // parameter name
                                        0,                 // minimum value
                                        1,                 // maximum value
                                        0),                // default value
-    
+
 std::make_unique<AudioParameterFloat> ("dlftype",         // parameterID
                                        "DLF Type",        // parameter name
                                        0,                 // minimum value
@@ -174,7 +174,7 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     svfL.init(AudioProcessor::getSampleRate());
     svfR.init(AudioProcessor::getSampleRate());
-    
+
     korgFilterL.init(AudioProcessor::getSampleRate());
     korgFilterR.init(AudioProcessor::getSampleRate());
 
@@ -186,7 +186,7 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     moogLadderL.setCutoff(64.0f);
     moogLadderR.setCutoff(64.0f);
-    
+
     diodeLadderL.init(AudioProcessor::getSampleRate());
     diodeLadderR.init(AudioProcessor::getSampleRate());
 
@@ -206,24 +206,11 @@ void ZedAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool ZedAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
-        return false;
-
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-   #endif
-
-    return true;
-  #endif
+    const auto& input = layouts.getMainInputChannelSet();
+    const auto& output = layouts.getMainOutputChannelSet();
+    return (input == juce::AudioChannelSet::mono()
+         || input == juce::AudioChannelSet::stereo())
+        && output == input;
 }
 #endif
 
@@ -240,7 +227,9 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         buffer.clear (i, 0, buffer.getNumSamples());
 
     auto* lChannelData = buffer.getWritePointer(0);
-    auto* rChannelData = buffer.getWritePointer(1);
+    // Mono uses the existing left filter state; never request a second channel.
+    auto* rChannelData = totalNumInputChannels > 1 && buffer.getNumChannels() > 1
+                      ? buffer.getWritePointer(1) : nullptr;
 
     svfL.setDrive(*inputDriveParameter);
     svfR.setDrive(*inputDriveParameter);
@@ -250,16 +239,16 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
     diodeLadderL.setDrive(*inputDriveParameter);
     diodeLadderR.setDrive(*inputDriveParameter);
-    
+
     moogLadderL.setDrive(*inputDriveParameter);
     moogLadderR.setDrive(*inputDriveParameter);
 
     int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
-    
+
     int filtertype = (*svfTypeParameter * 0) + (*skTypeParameter * 1) + (*tlfTypeParameter * 2) + (*dlfTypeParameter * 3);
-    
+
     filtertypeAtom.store(filtertype);
-    
+
     switch(filtermode){
         case 1:
             //LPF
@@ -321,9 +310,9 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
             }
             break;
     }
-    
+
     for (int j=0;j<buffer.getNumSamples();++j){
-        
+
         float smoothCutoff = smootherCutoff.dsp(*cutoffParameter);
         float smoothRes = smootherRes.dsp(*resParameter);
 
@@ -353,19 +342,23 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         switch(filtertype){
             case SVFMode: //state variable filter mode
                 outL = svfL.dsp(lChannelData[j]);
-                outR = svfR.dsp(rChannelData[j]);
+                if (rChannelData != nullptr)
+                    outR = svfR.dsp(rChannelData[j]);
                 break;
             case SKMode: //sallen key mode
                 outL = korgFilterL.dsp(lChannelData[j] * 2.0f);
-                outR = korgFilterR.dsp(rChannelData[j] * 2.0f);
+                if (rChannelData != nullptr)
+                    outR = korgFilterR.dsp(rChannelData[j] * 2.0f);
                 break;
             case TLFMode: //transistor ladder mode
                 outL = moogLadderL.dsp(lChannelData[j]) * 3.25f;
-                outR = moogLadderR.dsp(rChannelData[j]) * 3.25f;
+                if (rChannelData != nullptr)
+                    outR = moogLadderR.dsp(rChannelData[j]) * 3.25f;
                 break;
             case DLFMode:
                 outL = diodeLadderL.dsp(lChannelData[j]) * 10.0f;
-                outR = diodeLadderR.dsp(rChannelData[j]) * 10.0f;
+                if (rChannelData != nullptr)
+                    outR = diodeLadderR.dsp(rChannelData[j]) * 10.0f;
                 break;
             default:
                 break;
@@ -373,7 +366,8 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         };
 
         lChannelData[j] = outL;
-        rChannelData[j] = outR;
+        if (rChannelData != nullptr)
+            rChannelData[j] = outR;
     }
 }
 

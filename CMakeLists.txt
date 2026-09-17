@@ -62,3 +62,18 @@ if(APPLE)
         VERBATIM
     )
 endif()
+
+option(ZED_BUILD_TESTS "Build the focused channel-layout regression test" OFF)
+if(ZED_BUILD_TESTS)
+    enable_testing()
+    add_executable(ZEDChannelTests Tests/ChannelLayouts.cpp)
+    set_target_properties(ZEDChannelTests PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/ZEDChannelTests_artefacts/$<CONFIG>"
+    )
+    target_include_directories(ZEDChannelTests PRIVATE
+        Source Source/jdsplib
+        "$<TARGET_PROPERTY:ZED,JUCE_GENERATED_SOURCES_DIRECTORY>"
+    )
+    target_link_libraries(ZEDChannelTests PRIVATE ZED ZEDBinaryData juce::juce_audio_utils)
+    add_test(NAME ZEDChannelLayouts COMMAND ZEDChannelTests)
+endif()
