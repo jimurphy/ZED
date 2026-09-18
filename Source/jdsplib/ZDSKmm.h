@@ -20,6 +20,10 @@ public:
     // Clear audio history while retaining coefficients and controls.
     inline void reset() noexcept { lpf.reset(); hpf.reset(); }
 
+    // LP and HP are independent engines; switching clears only the destination.
+    inline void resetLowPass() noexcept { lpf.reset(); }
+    inline void resetHighPass() noexcept { hpf.reset(); }
+
     ZDSKmm(){
     }
 
@@ -67,6 +71,7 @@ public:
 
 private:
     friend struct ZedLifecycleTestAccess;
+    friend struct ZedTopologyTestAccess;
     ZDSK lpf;
     ZDSKHPF hpf;
 

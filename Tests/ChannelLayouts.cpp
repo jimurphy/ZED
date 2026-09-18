@@ -8,6 +8,7 @@
 
 void runConfigurationTests();
 void runLifecycleTests();
+void runTopologyTests();
 
 namespace
 {
@@ -127,6 +128,7 @@ int main(int argc, char** argv)
         {
             runConfigurationTests();
             runLifecycleTests();
+            runTopologyTests();
         }
         for (int topology = 0; topology < 4; ++topology)
             for (int mode = 0; mode < (topology == 0 ? 4 : topology == 1 ? 2 : 1); ++mode)

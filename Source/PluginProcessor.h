@@ -72,6 +72,11 @@ public:
 
 private:
     friend struct ZedLifecycleTestAccess;
+    friend struct ZedTopologyTestAccess;
+    enum class Engine { none, svf, sallenKeyLP, sallenKeyHP, transistorLadder, diodeLadder };
+    static Engine engineFor(zed::FilterConfiguration) noexcept;
+    void resetEngine(Engine) noexcept;
+    Engine activeEngine = Engine::none;
     bool dspPrepared = false;
     AudioProcessorValueTreeState parameters;
 

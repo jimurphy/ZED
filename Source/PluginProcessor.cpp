@@ -140,6 +140,7 @@ void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 void ZedAudioProcessor::reset()
 {
+    activeEngine = Engine::none;
     // Called serially with processing by the host. No allocation, notifications
     // or GUI work; clear both channels and every topology, including inactive ones.
     svfL.reset(); svfR.reset();
@@ -196,6 +197,37 @@ bool ZedAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) cons
 }
 #endif
 
+ZedAudioProcessor::Engine ZedAudioProcessor::engineFor(zed::FilterConfiguration configuration) noexcept
+{
+    switch (configuration)
+    {
+        case zed::FilterConfiguration::svfLP:
+        case zed::FilterConfiguration::svfHP:
+        case zed::FilterConfiguration::svfBP:
+        case zed::FilterConfiguration::svfBR: return Engine::svf;
+        case zed::FilterConfiguration::sallenKeyLP: return Engine::sallenKeyLP;
+        case zed::FilterConfiguration::sallenKeyHP: return Engine::sallenKeyHP;
+        case zed::FilterConfiguration::transistorLadderLP: return Engine::transistorLadder;
+        case zed::FilterConfiguration::diodeLadderLP: return Engine::diodeLadder;
+    }
+    return Engine::svf; // Same defensive fallback as configurationFromRaw().
+}
+
+void ZedAudioProcessor::resetEngine(Engine engine) noexcept
+{
+    // History only: retain rates, coefficients, controls and shared smoothers.
+    // Always reset both channels, even when processing a mono layout.
+    switch (engine)
+    {
+        case Engine::svf: svfL.reset(); svfR.reset(); break;
+        case Engine::sallenKeyLP: korgFilterL.resetLowPass(); korgFilterR.resetLowPass(); break;
+        case Engine::sallenKeyHP: korgFilterL.resetHighPass(); korgFilterR.resetHighPass(); break;
+        case Engine::transistorLadder: moogLadderL.reset(); moogLadderR.reset(); break;
+        case Engine::diodeLadder: diodeLadderL.reset(); diodeLadderR.reset(); break;
+        case Engine::none: break;
+    }
+}
+
 void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     svfL.setFilterType(3.0f);
@@ -226,7 +258,15 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     moogLadderR.setDrive(*inputDriveParameter);
 
     // One stable configuration snapshot per block; never repair or notify parameters here.
-    const auto selection = zed::selectionFor(getFilterConfiguration());
+    const auto configuration = getFilterConfiguration();
+    const auto destination = engineFor(configuration);
+    if (destination != activeEngine)
+    {
+        resetEngine(destination);
+        activeEngine = destination;
+    }
+    // Empty blocks commit the transition once but advance no samples/smoothers.
+    const auto selection = zed::selectionFor(configuration);
     const auto filtertype = selection.model;
 
     // Preserve the existing valid-response setter order, including inactive filters.

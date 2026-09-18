@@ -66,7 +66,7 @@ endif()
 option(ZED_BUILD_TESTS "Build the focused channel-layout regression test" OFF)
 if(ZED_BUILD_TESTS)
     enable_testing()
-    add_executable(ZEDChannelTests Tests/ChannelLayouts.cpp Tests/ConfigurationTests.cpp Tests/LifecycleTests.cpp)
+    add_executable(ZEDChannelTests Tests/ChannelLayouts.cpp Tests/ConfigurationTests.cpp Tests/LifecycleTests.cpp Tests/TopologyTests.cpp)
     set_target_properties(ZEDChannelTests PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/ZEDChannelTests_artefacts/$<CONFIG>"
     )
