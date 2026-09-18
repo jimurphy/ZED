@@ -19,6 +19,7 @@
 #include "ZDDL.h"
 #include "DCBlocker.h"
 #include "DSPMath.h"
+#include "FilterConfiguration.h"
 
 //==============================================================================
 /**
@@ -63,35 +64,20 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    //atomic to hold filter mode
-    std::atomic<int> filtermodeAtom = {0}; //LPF, HPF, etc.
-    std::atomic<int> filtertypeAtom = {0}; //SVF, SK, ladder, etc.
+    zed::FilterConfiguration getFilterConfiguration() const noexcept
+    {
+        return zed::configurationFromRaw(filterConfigurationParameter->load(std::memory_order_relaxed));
+    }
 
 private:
-    //==============================================================================
-    enum FilterTypes{
-        SVFMode,
-        SKMode,
-        TLFMode,
-        DLFMode
-    };
-    
     AudioProcessorValueTreeState parameters;
 
     //---------  Parameters
     std::atomic<float>* inputDriveParameter  = nullptr;
     std::atomic<float>* cutoffParameter  = nullptr;
     std::atomic<float>* resParameter     = nullptr;
-    
-    std::atomic<float>* lpfModeParameter = nullptr;
-    std::atomic<float>* hpfModeParameter = nullptr;
-    std::atomic<float>* bpfModeParameter = nullptr;
-    std::atomic<float>* brfModeParameter = nullptr;
-    
-    std::atomic<float>* svfTypeParameter = nullptr;
-    std::atomic<float>* skTypeParameter = nullptr;
-    std::atomic<float>* tlfTypeParameter = nullptr; //transistor ladder
-    std::atomic<float>* dlfTypeParameter = nullptr; //diode ladder
+
+    std::atomic<float>* filterConfigurationParameter = nullptr;
 
     ZDSVF svfL;
     ZDSVF svfR;
@@ -101,7 +87,7 @@ private:
 
     ZDML moogLadderL;
     ZDML moogLadderR;
-    
+
     ZDDL diodeLadderL;
     ZDDL diodeLadderR;
 

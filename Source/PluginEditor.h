@@ -23,12 +23,12 @@ struct SnappingSlider  : public Slider
 {
     float minVal = 0.6f;
     float maxVal = 1.4f;
-    
+
     void setMinMax(float min, float max){
         minVal = min;
         maxVal = max;
     }
-    
+
     double snapValue (double attemptedValue, DragMode dragMode) override
     {
         if (dragMode == notDragging)
@@ -47,7 +47,6 @@ class ZedAudioProcessorEditor  : public juce::AudioProcessorEditor,
 {
 public:
     typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
-    typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     ZedAudioProcessorEditor (ZedAudioProcessor&, AudioProcessorValueTreeState&);
     ~ZedAudioProcessorEditor() override;
@@ -57,22 +56,17 @@ public:
     void resized() override;
 
 private:
-    
+
     enum RadioButtonIds
     {
         FilterModeButtons = 1001,
         FilterTypeButtons = 1002
     };
-    
-    enum FilterTypes{
-        SVFMode,
-        SKMode,
-        TLFMode,
-        DLFMode
-    };
-    
+
     void timerCallback() override;
-    
+    void refreshConfiguration();
+    void chooseConfiguration(zed::FilterConfiguration);
+
     //Single instance of tooltip window
     SharedResourcePointer<CustomTooltip> tooltip_window;
 
@@ -81,7 +75,7 @@ private:
 
     ZedLookAndFeel zedLookAndFeel;
     FilterSpline filterWindow{valueTreeState};
-    
+
     //COLOURS
     Colour backgroundColour = juce::Colour(0xFF684A52);
     Colour sliderColour     = juce::Colour(0xFF87A0B2);
@@ -93,7 +87,7 @@ private:
     Slider freqSlider;
     Slider resSlider;
     SnappingSlider driveSlider;
-    
+
     //LABELS
     Label freqLabel;
     Label resLabel;
@@ -114,16 +108,8 @@ private:
     std::unique_ptr<SliderAttachment> driveAttachment;
     std::unique_ptr<SliderAttachment> freqAttachment;
     std::unique_ptr<SliderAttachment> resAttachment;
-    
-    std::unique_ptr<ButtonAttachment> lpfModeAttachment;
-    std::unique_ptr<ButtonAttachment> hpfModeAttachment;
-    std::unique_ptr<ButtonAttachment> bpfModeAttachment;
-    std::unique_ptr<ButtonAttachment> brfModeAttachment;
 
-    std::unique_ptr<ButtonAttachment> svfTypeAttachment;
-    std::unique_ptr<ButtonAttachment> skTypeAttachment;
-    std::unique_ptr<ButtonAttachment> tlfTypeAttachment; //transistor ladder
-    std::unique_ptr<ButtonAttachment> dlfTypeAttachment; //diode ladder
+    juce::RangedAudioParameter& configurationParameter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZedAudioProcessorEditor)
 };
