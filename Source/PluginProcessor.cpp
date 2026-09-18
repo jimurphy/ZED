@@ -122,35 +122,67 @@ void ZedAudioProcessor::changeProgramName (int index, const juce::String& newNam
 //==============================================================================
 void ZedAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    svfL.init(AudioProcessor::getSampleRate());
-    svfR.init(AudioProcessor::getSampleRate());
+    // The callback argument is authoritative, including fractional host rates.
+    svfL.init(sampleRate);
+    svfR.init(sampleRate);
+    korgFilterL.init(sampleRate);
+    korgFilterR.init(sampleRate);
+    moogLadderL.init(sampleRate);
+    moogLadderR.init(sampleRate);
+    diodeLadderL.init(sampleRate);
+    diodeLadderR.init(sampleRate);
 
-    korgFilterL.init(AudioProcessor::getSampleRate());
-    korgFilterR.init(AudioProcessor::getSampleRate());
+    smootherCutoff.setCutoff(4.0f, sampleRate);
+    smootherRes.setCutoff(4.0f, sampleRate);
+    dspPrepared = true;
+    reset();
+}
 
-    korgFilterL.setCutoff(64.0f);
-    korgFilterR.setCutoff(64.0f);
+void ZedAudioProcessor::reset()
+{
+    // Called serially with processing by the host. No allocation, notifications
+    // or GUI work; clear both channels and every topology, including inactive ones.
+    svfL.reset(); svfR.reset();
+    korgFilterL.reset(); korgFilterR.reset();
+    moogLadderL.reset(); moogLadderR.reset();
+    diodeLadderL.reset(); diodeLadderR.reset();
+    dcblocker1.reset(); dcblocker2.reset();
 
-    moogLadderL.init(AudioProcessor::getSampleRate());
-    moogLadderR.init(AudioProcessor::getSampleRate());
+    const float cutoff = cutoffParameter->load(std::memory_order_relaxed);
+    const float resonance = resParameter->load(std::memory_order_relaxed);
+    const float drive = inputDriveParameter->load(std::memory_order_relaxed);
+    smootherCutoff.reset(cutoff);
+    smootherRes.reset(resonance);
 
-    moogLadderL.setCutoff(64.0f);
-    moogLadderR.setCutoff(64.0f);
+    // reset() is also safe before the first prepare: no coefficient calculation
+    // may use an unconfigured sample rate. Parameters themselves are never changed.
+    if (!dspPrepared)
+        return;
 
-    diodeLadderL.init(AudioProcessor::getSampleRate());
-    diodeLadderR.init(AudioProcessor::getSampleRate());
+    svfL.setQ(resonance); svfR.setQ(resonance);
+    korgFilterL.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 0.9f));
+    korgFilterR.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 0.9f));
+    moogLadderL.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 1.05f));
+    moogLadderR.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 1.05f));
+    diodeLadderL.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 1.125f));
+    diodeLadderR.setResonance(map(resonance, 0.0f, 1.1f, 0.0f, 1.125f));
 
-    diodeLadderL.setCutoff(64.0f);
-    diodeLadderR.setCutoff(64.0f);
-
-    smootherCutoff.setCutoff(4.0f, AudioProcessor::getSampleRate());
-    smootherRes.setCutoff(4.0f, AudioProcessor::getSampleRate());
+    svfL.setCutoff(cutoff); svfR.setCutoff(cutoff);
+    korgFilterL.setCutoff(cutoff); korgFilterR.setCutoff(cutoff);
+    moogLadderL.setCutoff(cutoff); moogLadderR.setCutoff(cutoff);
+    diodeLadderL.setCutoff(cutoff); diodeLadderR.setCutoff(cutoff);
+    svfL.setDrive(drive); svfR.setDrive(drive);
+    korgFilterL.setDrive(drive); korgFilterR.setDrive(drive);
+    moogLadderL.setDrive(drive); moogLadderR.setDrive(drive);
+    diodeLadderL.setDrive(drive); diodeLadderR.setDrive(drive);
 }
 
 void ZedAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    // No dynamic DSP resources to release. Clear tails at the end of playback;
+    // a later prepare configures rates and clears history again.
+    reset();
+    dspPrepared = false;
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

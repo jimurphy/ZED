@@ -13,12 +13,15 @@
 
 class OnePoleLP {
 public:
+    // Clear audio history while retaining coefficients and controls.
+    inline void reset(float value = 0.0f) noexcept { z1 = value; }
+
     OnePoleLP(){
     }
-    
+
     ~OnePoleLP(){};
-    
-    inline void setCutoff(float freq, float fs){
+
+    inline void setCutoff(float freq, double fs){
         float x = exp(-2.0f * M_PI * freq / fs);
         a0 = 1.0f - x;
         b1 = -1.0f * x;
@@ -29,8 +32,9 @@ public:
         z1 = output;
         return(output);
     }
-    
+
 private:
+    friend struct ZedLifecycleTestAccess;
     float       a0 = 0.0f;;
     float       b1 = 0.0f;;
     float       z1 = 0.0f;
