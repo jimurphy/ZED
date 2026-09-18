@@ -11,14 +11,15 @@
 
 //==============================================================================
 ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState (vts)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState (vts),
+      configurationParameter (*vts.getParameter(zed::filterConfigurationID))
 {
     setLookAndFeel(&zedLookAndFeel);
-    
+
     addAndMakeVisible(filterWindow);
-    
+
     setSize (310, 200);
-    
+
     tooltip_window->setMillisecondsBeforeTipAppears(250);
     tooltip_window->setLookAndFeel(&zedLookAndFeel);
 
@@ -71,72 +72,93 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
     //buttons
     addAndMakeVisible(lpfButton);
     lpfButton.setRadioGroupId(FilterModeButtons);
-    lpfButton.setClickingTogglesState(true);
+    lpfButton.setClickingTogglesState(false);
     lpfButton.setButtonText("LP");
     lpfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     lpfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    lpfModeAttachment.reset(new ButtonAttachment(valueTreeState, "lpfmode", lpfButton));
 
     addAndMakeVisible(hpfButton);
     hpfButton.setRadioGroupId(FilterModeButtons);
-    hpfButton.setClickingTogglesState(true);
+    hpfButton.setClickingTogglesState(false);
     hpfButton.setButtonText("HP");
     hpfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     hpfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    hpfModeAttachment.reset(new ButtonAttachment(valueTreeState, "hpfmode", hpfButton));
 
     addAndMakeVisible(bpfButton);
     bpfButton.setRadioGroupId(FilterModeButtons);
-    bpfButton.setClickingTogglesState(true);
+    bpfButton.setClickingTogglesState(false);
     bpfButton.setButtonText("BP");
     bpfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     bpfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    bpfModeAttachment.reset(new ButtonAttachment(valueTreeState, "bpfmode", bpfButton));
 
     addAndMakeVisible(brfButton);
     brfButton.setRadioGroupId(FilterModeButtons);
-    brfButton.setClickingTogglesState(true);
+    brfButton.setClickingTogglesState(false);
     brfButton.setButtonText("BR");
     brfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     brfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    brfModeAttachment.reset(new ButtonAttachment(valueTreeState, "brfmode", brfButton));
 
     addAndMakeVisible(svfButton);
     svfButton.setRadioGroupId(FilterTypeButtons);
-    svfButton.setClickingTogglesState(true);
+    svfButton.setClickingTogglesState(false);
     svfButton.setButtonText("SVF");
     svfButton.setTooltip("STATE VARIABLE FILTER");
     svfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     svfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    svfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "svftype", svfButton));
 
     addAndMakeVisible(skButton);
     skButton.setRadioGroupId(FilterTypeButtons);
-    skButton.setClickingTogglesState(true);
+    skButton.setClickingTogglesState(false);
     skButton.setButtonText("SK");
     skButton.setTooltip("SALLEN-KEY FILTER");
     skButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     skButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    skTypeAttachment.reset(new ButtonAttachment(valueTreeState, "sktype", skButton));
 
     addAndMakeVisible(tlfButton);
     tlfButton.setRadioGroupId(FilterTypeButtons);
-    tlfButton.setClickingTogglesState(true);
+    tlfButton.setClickingTogglesState(false);
     tlfButton.setButtonText("TL");
     tlfButton.setTooltip("TRANSISTOR LADDER FILTER");
     tlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     tlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    tlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "tlftype", tlfButton));
 
     addAndMakeVisible(dlfButton);
     dlfButton.setRadioGroupId(FilterTypeButtons);
-    dlfButton.setClickingTogglesState(true);
+    dlfButton.setClickingTogglesState(false);
     dlfButton.setButtonText("DL");
     dlfButton.setTooltip("DIODE LADDER FILTER");
     dlfButton.setColour(TextButton::buttonColourId, Colour(buttonOffColour));
     dlfButton.setColour(TextButton::buttonOnColourId, Colour(buttonOnColour));
-    dlfTypeAttachment.reset(new ButtonAttachment(valueTreeState, "dlftype", dlfButton));
-    
+
+    // A click changes only the combined parameter. Radio state is projected back
+    // with no notifications, avoiding callbacks from deselected radio buttons.
+    const std::array<TextButton*, 4> models { &svfButton, &skButton, &tlfButton, &dlfButton };
+    const std::array<zed::FilterModel, 4> modelValues {
+        zed::FilterModel::svf, zed::FilterModel::sallenKey,
+        zed::FilterModel::transistorLadder, zed::FilterModel::diodeLadder
+    };
+    for (size_t i = 0; i < models.size(); ++i)
+        models[i]->onClick = [this, model = modelValues[i]] {
+            chooseConfiguration(zed::selectModel(audioProcessor.getFilterConfiguration(), model));
+        };
+
+    const std::array<TextButton*, 4> responses { &lpfButton, &hpfButton, &bpfButton, &brfButton };
+    const std::array<zed::FilterResponse, 4> responseValues {
+        zed::FilterResponse::lp, zed::FilterResponse::hp,
+        zed::FilterResponse::bp, zed::FilterResponse::br
+    };
+    for (size_t i = 0; i < responses.size(); ++i)
+        responses[i]->onClick = [this, response = responseValues[i]] {
+            const auto model = zed::selectionFor(audioProcessor.getFilterConfiguration()).model;
+            // Recheck the latest value: automation may have changed the model
+            // since the last message-thread refresh enabled this button.
+            if (zed::responseAvailable(model, response))
+                chooseConfiguration(zed::configurationFor(model, response));
+            else
+                refreshConfiguration();
+        };
+    refreshConfiguration();
+
     //labels
     auto labelFont = Font(10.0);
 
@@ -166,6 +188,7 @@ ZedAudioProcessorEditor::ZedAudioProcessorEditor (ZedAudioProcessor& p, AudioPro
 
 ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
 {
+    stopTimer();
     tooltip_window->setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
@@ -174,12 +197,12 @@ ZedAudioProcessorEditor::~ZedAudioProcessorEditor()
 void ZedAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll(backgroundColour);
-    
+
     g.setColour(sliderColour);
     g.setFont (11.0f);
     g.drawFittedText ("INPUT", 12, 174, 100, 100, 9, 1.0f);
     g.drawFittedText ("DRIVE", 12, 184, 100, 100, 9, 1.0f);
-        
+
     g.setColour(sliderColour);
     g.setFont (16.0f);
     g.drawFittedText ("ZED", 213, 171, 100, 100, 9, 1.0f);
@@ -191,11 +214,11 @@ void ZedAudioProcessorEditor::paint (juce::Graphics& g)
 void ZedAudioProcessorEditor::resized()
 {
     filterWindow.setBounds(51, 20, 219, 110);
-    
+
     freqSlider.setBounds(42, 140, 237, 20);
     resSlider.setBounds(280, 12, 20, 125);
     driveSlider.setBounds(15, 132, 20, 50);
-    
+
     lpfButton.setBounds(10, 20, 31, 20);
     hpfButton.setBounds(10, 50, 31, 20);
     bpfButton.setBounds(10, 80, 31, 20);
@@ -211,44 +234,44 @@ void ZedAudioProcessorEditor::resized()
     driveLabel.setBounds(225, 43, 50, 10);
 }
 
+void ZedAudioProcessorEditor::chooseConfiguration(zed::FilterConfiguration configuration)
+{
+    configurationParameter.beginChangeGesture();
+    configurationParameter.setValueNotifyingHost(
+        configurationParameter.convertTo0to1(static_cast<float>(configuration)));
+    configurationParameter.endChangeGesture();
+    refreshConfiguration();
+}
+
+void ZedAudioProcessorEditor::refreshConfiguration()
+{
+    const auto selection = zed::selectionFor(audioProcessor.getFilterConfiguration());
+    const std::array<TextButton*, 4> models { &svfButton, &skButton, &tlfButton, &dlfButton };
+    const std::array<zed::FilterModel, 4> modelValues {
+        zed::FilterModel::svf, zed::FilterModel::sallenKey,
+        zed::FilterModel::transistorLadder, zed::FilterModel::diodeLadder
+    };
+    for (size_t i = 0; i < models.size(); ++i)
+        models[i]->setToggleState(selection.model == modelValues[i], dontSendNotification);
+
+    const std::array<TextButton*, 4> responses { &lpfButton, &hpfButton, &bpfButton, &brfButton };
+    const std::array<zed::FilterResponse, 4> responseValues {
+        zed::FilterResponse::lp, zed::FilterResponse::hp,
+        zed::FilterResponse::bp, zed::FilterResponse::br
+    };
+    for (size_t i = 0; i < responses.size(); ++i)
+    {
+        responses[i]->setToggleState(selection.response == responseValues[i], dontSendNotification);
+        responses[i]->setEnabled(zed::responseAvailable(selection.model, responseValues[i]));
+    }
+    filterWindow.setMode(static_cast<int>(selection.response));
+}
+
 void ZedAudioProcessorEditor::timerCallback()
 {
-    int filterMode = audioProcessor.filtermodeAtom.load(); // Get filter mode (HP, LP, etc.)
-    int filterType = audioProcessor.filtertypeAtom.load(); // Get filter type (SVF, SK, etc.)
-    
-    switch(filterType){
-        case SVFMode:
-            lpfButton.setEnabled(true);
-            hpfButton.setEnabled(true);
-            bpfButton.setEnabled(true);
-            brfButton.setEnabled(true);
-            break;
-        case SKMode:
-            lpfButton.setEnabled(true);
-            hpfButton.setEnabled(true);
-            bpfButton.setEnabled(false);
-            brfButton.setEnabled(false);
-            break;
-        case TLFMode:
-            lpfButton.setEnabled(true);
-            hpfButton.setEnabled(false);
-            bpfButton.setEnabled(false);
-            brfButton.setEnabled(false);
-            break;
-        case DLFMode:
-            lpfButton.setEnabled(true);
-            hpfButton.setEnabled(false);
-            bpfButton.setEnabled(false);
-            brfButton.setEnabled(false);
-            break;
-        default:
-            lpfButton.setEnabled(false);
-            hpfButton.setEnabled(false);
-            bpfButton.setEnabled(false);
-            brfButton.setEnabled(false);
-            break;
-    };
-    
-    filterWindow.setMode(filterMode);
+    // JUCE Timer runs on the message thread. Poll the parameter directly, not
+    // audio-thread status: automation/restoration also works while audio is stopped.
+    // No parameter listeners, cross-thread Component access or posted callbacks.
+    refreshConfiguration();
     repaint();
 }

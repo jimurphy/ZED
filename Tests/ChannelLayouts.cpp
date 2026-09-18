@@ -1,9 +1,12 @@
 #include "PluginProcessor.h"
 #include <cmath>
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+
+void runConfigurationTests();
 
 namespace
 {
@@ -59,13 +62,9 @@ std::vector<float> render(int channels, int topology, int mode, int activeChanne
     const auto set = channels == 1 ? juce::AudioChannelSet::mono() : juce::AudioChannelSet::stereo();
     require(processor.setBusesLayout(layout(set, set)), "Layout rejected");
     processor.setRateAndBufferSizeDetails(48000.0, 512);
-    const char* types[] { "svftype", "sktype", "tlftype", "dlftype" };
-    const char* modes[] { "lpfmode", "hpfmode", "bpfmode", "brfmode" };
-    for (int i = 0; i < 4; ++i)
-    {
-        setParameter(processor, types[i], i == topology ? 1.0f : 0.0f);
-        setParameter(processor, modes[i], i == mode ? 1.0f : 0.0f);
-    }
+    const auto configuration = zed::configurationFor(static_cast<zed::FilterModel>(topology),
+                                                       static_cast<zed::FilterResponse>(mode + 1));
+    setParameter(processor, zed::filterConfigurationID, static_cast<float>(configuration));
     processor.prepareToPlay(48000.0, 512);
     juce::MidiBuffer midi;
     std::vector<float> output;
@@ -83,6 +82,7 @@ std::vector<float> render(int channels, int topology, int mode, int activeChanne
                         0.2f * std::sin(0.031f * static_cast<float>(position + sample))
                         + (position + sample == 0 ? 0.5f : 0.0f));
             processor.processBlock(buffer, midi);
+            require(processor.getFilterConfiguration() == configuration, "Processing mutated configuration");
             require(buffer.getNumChannels() == channels, "Buffer channel count changed");
             for (int sample = 0; sample < count; ++sample)
                 for (int channel = 0; channel < channels; ++channel)
@@ -108,7 +108,11 @@ int main(int argc, char** argv)
     {
         juce::ScopedJuceInitialiser_GUI initialiseJuce;
         const bool dumpStereo = argc == 3 && juce::String(argv[1]) == "--dump-stereo";
-        require(argc == 1 || dumpStereo, "Usage: ZEDChannelTests [--dump-stereo file]");
+        const bool dumpConfigurations = argc == 3 && juce::String(argv[1]) == "--dump-configurations";
+        require(argc == 1 || dumpStereo || dumpConfigurations,
+                "Usage: ZEDChannelTests [--dump-stereo file | --dump-configurations directory]");
+        if (dumpConfigurations)
+            std::filesystem::create_directories(argv[2]);
         std::ofstream dump;
         if (dumpStereo)
         {
@@ -116,12 +120,25 @@ int main(int argc, char** argv)
             require(dump.good(), "Cannot open stereo output file");
         }
         checkLayouts();
+        if (!dumpStereo && !dumpConfigurations)
+            runConfigurationTests();
         for (int topology = 0; topology < 4; ++topology)
             for (int mode = 0; mode < (topology == 0 ? 4 : topology == 1 ? 2 : 1); ++mode)
             {
                 const auto left = render(2, topology, mode, 0);
                 const auto right = render(2, topology, mode, 1);
-                if (dumpStereo)
+                if (dumpConfigurations)
+                {
+                    const auto mono = render(1, topology, mode, 0);
+                    std::ofstream file(std::filesystem::path(argv[2]) /
+                                       (std::to_string(topology) + "-" + std::to_string(mode) + ".bin"),
+                                       std::ios::binary);
+                    for (const auto* data : { &mono, &left, &right })
+                        file.write(reinterpret_cast<const char*>(data->data()),
+                                   static_cast<std::streamsize>(data->size() * sizeof(float)));
+                    require(file.good(), "Configuration output write failed");
+                }
+                else if (dumpStereo)
                 {
                     for (const auto* data : { &left, &right })
                         dump.write(reinterpret_cast<const char*>(data->data()),

@@ -40,67 +40,17 @@ std::make_unique<AudioParameterFloat> ("resonance",        // parameterID
                                        0.7f //default val
                                        ),
 
-std::make_unique<AudioParameterFloat> ("lpfmode",         // parameterID
-                                       "LPFMode",         // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       1),                // default value
-
-std::make_unique<AudioParameterFloat> ("hpfmode",         // parameterID
-                                       "HPFMode",         // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0),                // default value
-
-std::make_unique<AudioParameterFloat> ("bpfmode",         // parameterID
-                                       "BPFMode",         // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0),                // default value
-
-std::make_unique<AudioParameterFloat> ("brfmode",         // parameterID
-                                       "BRF Mode",        // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0),                 // default value
-
-std::make_unique<AudioParameterFloat> ("svftype",         // parameterID
-                                       "SVF Type",        // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       1),                // default value
-
-std::make_unique<AudioParameterFloat> ("sktype",          // parameterID
-                                       "SK Type",         // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0),                // default value
-
-std::make_unique<AudioParameterFloat> ("tlftype",         // parameterID
-                                       "TLF Type",        // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0),                // default value
-
-std::make_unique<AudioParameterFloat> ("dlftype",         // parameterID
-                                       "DLF Type",        // parameter name
-                                       0,                 // minimum value
-                                       1,                 // maximum value
-                                       0)                 // default value
+std::make_unique<AudioParameterChoice> (
+    zed::filterConfigurationID, "Filter configuration",
+    StringArray(zed::configurationNames.data(), static_cast<int>(zed::configurationNames.size())),
+    static_cast<int>(zed::FilterConfiguration::svfLP))
 
 })
 {
     inputDriveParameter           = parameters.getRawParameterValue("drive");
     cutoffParameter               = parameters.getRawParameterValue("cutoff");
     resParameter                  = parameters.getRawParameterValue("resonance");
-    lpfModeParameter              = parameters.getRawParameterValue("lpfmode");
-    hpfModeParameter              = parameters.getRawParameterValue("hpfmode");
-    bpfModeParameter              = parameters.getRawParameterValue("bpfmode");
-    brfModeParameter              = parameters.getRawParameterValue("brfmode");
-    svfTypeParameter              = parameters.getRawParameterValue("svftype");
-    skTypeParameter               = parameters.getRawParameterValue("sktype");
-    tlfTypeParameter              = parameters.getRawParameterValue("tlftype");
-    dlfTypeParameter              = parameters.getRawParameterValue("dlftype");
+    filterConfigurationParameter = parameters.getRawParameterValue(zed::filterConfigurationID);
 }
 
 ZedAudioProcessor::~ZedAudioProcessor()
@@ -243,71 +193,32 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     moogLadderL.setDrive(*inputDriveParameter);
     moogLadderR.setDrive(*inputDriveParameter);
 
-    int filtermode = (*lpfModeParameter * 1) + (*hpfModeParameter * 2) + (*bpfModeParameter * 3) + (*brfModeParameter * 4);
+    // One stable configuration snapshot per block; never repair or notify parameters here.
+    const auto selection = zed::selectionFor(getFilterConfiguration());
+    const auto filtertype = selection.model;
 
-    int filtertype = (*svfTypeParameter * 0) + (*skTypeParameter * 1) + (*tlfTypeParameter * 2) + (*dlfTypeParameter * 3);
-
-    filtertypeAtom.store(filtertype);
-
-    switch(filtermode){
-        case 1:
-            //LPF
-            svfL.setFilterType(3.0f); //3 = lp
-            svfR.setFilterType(3.0f); //3 = lp
-            korgFilterL.setFilterType(0); //0 = lp
-            korgFilterR.setFilterType(0); //0 = lp
-            filtermodeAtom.store(1);
+    // Preserve the existing valid-response setter order, including inactive filters.
+    switch (selection.response)
+    {
+        case zed::FilterResponse::lp:
+            svfL.setFilterType(3.0f);
+            svfR.setFilterType(3.0f);
+            korgFilterL.setFilterType(0);
+            korgFilterR.setFilterType(0);
             break;
-        case 2:
-            //HPF
-            if(filtertype == SVFMode || filtertype == SKMode){
-                svfL.setFilterType(1.0f); //1 = hp
-                svfR.setFilterType(1.0f); //1 = hp
-                korgFilterL.setFilterType(1); //1 = hp
-                korgFilterR.setFilterType(1); //1 = hp
-                filtermodeAtom.store(2);
-            }
-            else{
-                //kick it back to LPF if not an SVF or SKF
-                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
-                lpfParamVal.setValue(1);
-                svfL.setFilterType(3.0f); //3 = lp
-                svfR.setFilterType(3.0f); //3 = lp
-                filtermodeAtom.store(1);
-            }
+        case zed::FilterResponse::hp:
+            svfL.setFilterType(1.0f);
+            svfR.setFilterType(1.0f);
+            korgFilterL.setFilterType(1);
+            korgFilterR.setFilterType(1);
             break;
-        case 3:
-            //BPF
-            if(filtertype == SVFMode){
-                svfL.setFilterType(2.0f); //2 = bp
-                svfR.setFilterType(2.0f); //2 = bp
-                filtermodeAtom.store(3);
-            }
-            else{
-                //kick it back to LPF if not an SVF
-                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
-                lpfParamVal.setValue(1);
-                svfL.setFilterType(3.0f); //3 = lp
-                svfR.setFilterType(3.0f); //3 = lp
-                filtermodeAtom.store(1);
-            }
+        case zed::FilterResponse::bp:
+            svfL.setFilterType(2.0f);
+            svfR.setFilterType(2.0f);
             break;
-        case 4:
-            //BRF
-            if(filtertype == SVFMode){
-                svfL.setFilterType(4.0f); //4 = br/notch
-                svfR.setFilterType(4.0f); //4 = br/notch
-                filtermodeAtom.store(4);
-            }
-            else{
-                //kick it back to LPF if not an SVF
-                Value lpfParamVal = parameters.getParameterAsValue("lpfmode");
-                lpfParamVal.setValue(1);
-
-                svfL.setFilterType(3.0f); //3 = lp
-                svfR.setFilterType(3.0f); //3 = lp
-                filtermodeAtom.store(1);
-            }
+        case zed::FilterResponse::br:
+            svfL.setFilterType(4.0f);
+            svfR.setFilterType(4.0f);
             break;
     }
 
@@ -340,22 +251,22 @@ void ZedAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         float outR = 0.0f;
 
         switch(filtertype){
-            case SVFMode: //state variable filter mode
+            case zed::FilterModel::svf: //state variable filter mode
                 outL = svfL.dsp(lChannelData[j]);
                 if (rChannelData != nullptr)
                     outR = svfR.dsp(rChannelData[j]);
                 break;
-            case SKMode: //sallen key mode
+            case zed::FilterModel::sallenKey: //sallen key mode
                 outL = korgFilterL.dsp(lChannelData[j] * 2.0f);
                 if (rChannelData != nullptr)
                     outR = korgFilterR.dsp(rChannelData[j] * 2.0f);
                 break;
-            case TLFMode: //transistor ladder mode
+            case zed::FilterModel::transistorLadder: //transistor ladder mode
                 outL = moogLadderL.dsp(lChannelData[j]) * 3.25f;
                 if (rChannelData != nullptr)
                     outR = moogLadderR.dsp(rChannelData[j]) * 3.25f;
                 break;
-            case DLFMode:
+            case zed::FilterModel::diodeLadder:
                 outL = diodeLadderL.dsp(lChannelData[j]) * 10.0f;
                 if (rChannelData != nullptr)
                     outR = diodeLadderR.dsp(rChannelData[j]) * 10.0f;

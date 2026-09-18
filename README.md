@@ -1,5 +1,9 @@
 # ZED CMake build
 
+Filter selection now uses the single eight-choice `filterConfiguration`
+parameter. See [the parameter contract and validation](FILTER_CONFIGURATION.md)
+for its fixed ordering, GUI rules and intentional break from legacy selectors.
+
 See [baseline validation results](VALIDATION.md) for the fresh arm64 build,
 exact tool versions, portable build commands, pluginval results, and Git exclusions.
 
@@ -47,9 +51,10 @@ See [Ableton's macOS plug-in setup instructions](https://help.ableton.com/hc/en-
 - Plug-in code: `Zedd`; bundle identifier: `com.SouthCoastSynthesis.ZED`.
 - VST3 category: `Fx|Filter`; VST2 replacement disabled.
 - Audio effect with no MIDI input/output and no editor keyboard focus requirement.
-- Existing parameter IDs, ranges, defaults, bus declarations, state handling,
-  and DSP are retained. Realtime-state, mono/stereo, and parameter-design issues
-  are outside this build migration.
+- Continuous parameter IDs, ranges and defaults are retained. The subsequent
+  channel-layout and filter-configuration changes are documented in
+  [CHANNEL_VALIDATION.md](CHANNEL_VALIDATION.md) and
+  [FILTER_CONFIGURATION.md](FILTER_CONFIGURATION.md).
 
 The CMake build disables unused browser and curl support and retains the existing
 strict reference-counted pointer setting.
