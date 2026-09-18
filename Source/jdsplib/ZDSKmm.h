@@ -17,13 +17,16 @@
 
 class ZDSKmm{
 public:
+    // Clear audio history while retaining coefficients and controls.
+    inline void reset() noexcept { lpf.reset(); hpf.reset(); }
+
     ZDSKmm(){
     }
-    
+
     ~ZDSKmm(){};
-    
+
     //init
-    inline void init(float samplerate){
+    inline void init(double samplerate){
         sr = samplerate;
         lpf.init(sr);
         hpf.init(sr);
@@ -33,25 +36,25 @@ public:
     inline void setFilterType(int ft){
         filterType = ft;
     }
-    
+
     //set cutoff
     inline void setCutoff(float pitch){
         lpf.setCutoff(pitch);
         hpf.setCutoff(pitch);
     }
-    
+
     //set resonance
     inline void setResonance(float res){
         lpf.setResonance(res);
         hpf.setResonance(res);
     }
-    
+
     //set drive
     inline void setDrive(float d){
         lpf.setDrive(d);
         hpf.setDrive(d);
     }
-    
+
     //dsp
     inline float dsp(float ip){
         if(filterType == LPF )
@@ -61,13 +64,14 @@ public:
         else
             return 0.0f;
     }
-    
+
 private:
+    friend struct ZedLifecycleTestAccess;
     ZDSK lpf;
     ZDSKHPF hpf;
-    
+
     enum{LPF, HPF};
-    
+
     int filterType = LPF; //0 == LPF, 1 == HPF
-    float sr = 44100.0f;
+    double sr = 0.0; // Set by init before processing.
 };

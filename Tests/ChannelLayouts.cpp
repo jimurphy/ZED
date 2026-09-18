@@ -7,6 +7,7 @@
 #include <vector>
 
 void runConfigurationTests();
+void runLifecycleTests();
 
 namespace
 {
@@ -56,16 +57,16 @@ void checkLayouts()
 }
 
 // Each render uses fresh processor state. No second channel exists in mono buffers.
-std::vector<float> render(int channels, int topology, int mode, int activeChannel)
+std::vector<float> render(int channels, int topology, int mode, int activeChannel, double sampleRate = 48000.0)
 {
     ZedAudioProcessor processor;
     const auto set = channels == 1 ? juce::AudioChannelSet::mono() : juce::AudioChannelSet::stereo();
     require(processor.setBusesLayout(layout(set, set)), "Layout rejected");
-    processor.setRateAndBufferSizeDetails(48000.0, 512);
+    processor.setRateAndBufferSizeDetails(sampleRate, 512);
     const auto configuration = zed::configurationFor(static_cast<zed::FilterModel>(topology),
                                                        static_cast<zed::FilterResponse>(mode + 1));
     setParameter(processor, zed::filterConfigurationID, static_cast<float>(configuration));
-    processor.prepareToPlay(48000.0, 512);
+    processor.prepareToPlay(sampleRate, 512);
     juce::MidiBuffer midi;
     std::vector<float> output;
     int position = 0;
@@ -108,9 +109,11 @@ int main(int argc, char** argv)
     {
         juce::ScopedJuceInitialiser_GUI initialiseJuce;
         const bool dumpStereo = argc == 3 && juce::String(argv[1]) == "--dump-stereo";
-        const bool dumpConfigurations = argc == 3 && juce::String(argv[1]) == "--dump-configurations";
+        const bool dump44100 = argc == 3 && juce::String(argv[1]) == "--dump-44100";
+        const bool dumpConfigurations = dump44100 || (argc == 3 && juce::String(argv[1]) == "--dump-configurations");
+        const double sampleRate = dump44100 ? 44100.0 : 48000.0;
         require(argc == 1 || dumpStereo || dumpConfigurations,
-                "Usage: ZEDChannelTests [--dump-stereo file | --dump-configurations directory]");
+                "Usage: ZEDChannelTests [--dump-stereo file | --dump-configurations directory | --dump-44100 directory]");
         if (dumpConfigurations)
             std::filesystem::create_directories(argv[2]);
         std::ofstream dump;
@@ -121,15 +124,18 @@ int main(int argc, char** argv)
         }
         checkLayouts();
         if (!dumpStereo && !dumpConfigurations)
+        {
             runConfigurationTests();
+            runLifecycleTests();
+        }
         for (int topology = 0; topology < 4; ++topology)
             for (int mode = 0; mode < (topology == 0 ? 4 : topology == 1 ? 2 : 1); ++mode)
             {
-                const auto left = render(2, topology, mode, 0);
-                const auto right = render(2, topology, mode, 1);
+                const auto left = render(2, topology, mode, 0, sampleRate);
+                const auto right = render(2, topology, mode, 1, sampleRate);
                 if (dumpConfigurations)
                 {
-                    const auto mono = render(1, topology, mode, 0);
+                    const auto mono = render(1, topology, mode, 0, sampleRate);
                     std::ofstream file(std::filesystem::path(argv[2]) /
                                        (std::to_string(topology) + "-" + std::to_string(mode) + ".bin"),
                                        std::ios::binary);
@@ -146,8 +152,8 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    const auto mono = render(1, topology, mode, 0);
-                    const auto silence = render(1, topology, mode, -1);
+                    const auto mono = render(1, topology, mode, 0, sampleRate);
+                    const auto silence = render(1, topology, mode, -1, sampleRate);
                     require(left.size() == mono.size() * 2, "Output length mismatch");
                     for (size_t i = 0; i < mono.size(); ++i)
                     {

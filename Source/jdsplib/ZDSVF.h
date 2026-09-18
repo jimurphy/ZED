@@ -14,12 +14,15 @@
 
 class ZDSVF {
 public:
+    // Clear audio history while retaining coefficients and controls.
+    inline void reset() noexcept { lp = hp = bp = br = z1 = z2 = 0.0f; }
+
     ZDSVF(){
     }
-    
+
     ~ZDSVF(){};
-    
-    inline void init(float samplerate){
+
+    inline void init(double samplerate){
         sr = samplerate;
     }
 
@@ -27,7 +30,7 @@ public:
     inline void setLFOModDepth(float lfomoddepth){
         lfoModDepth = lfomoddepth;
     }
-    
+
     inline void setEnvelopeModDepthAndInversion(float envmoddepth, float inv){
         envelopeModDepth = envmoddepth;
         envelopeInverted = inv; //0 == normal, 1 == inverted
@@ -37,7 +40,7 @@ public:
         //from -1 to 1 TO +/- lfomoddepth (semitones)
         lfoModValue = map(lfoIn,-1.0,1.0,semi2freq(lfoModDepth*-1),semi2freq(lfoModDepth));
     }
-    
+
     inline void envelopeInput(float envIn){
         if(envelopeInverted == 0){ //if not inverted, then normal envelope
             //from 0 to 1 TO 0 to LFOModDepth
@@ -49,12 +52,12 @@ public:
             envModValue = map(envIn, 0.0,1.0,semi2freq(0),semi2freq(envelopeModDepth*-1));
         }
     }
-    
+
     inline void setQ(float q){
         //r = 1.0/(2.0*q);
         r = 2.0 * (1.0 - q); //Martijn code, q -> 0.0 - 1.0
     }
-    
+
     inline void setCutoff(float cutoffin){
         float cutoffFreq = p2f(cutoffin);
         cutoffFreq = cutoffFreq*lfoModValue*envModValue;
@@ -66,11 +69,11 @@ public:
         wa = (2/t)*std::tan(wd*t/2);
         g = wa*t/2;
     }
-    
+
     inline void setDrive(float drive){
         driveGain = drive; //range can exceed 1.0
     }
-    
+
     inline void setFilterType(float filter){
         filterType = filter;
     }
@@ -78,17 +81,17 @@ public:
     inline float dsp(float input){
         //process input through tanh waveshaper
         input = fasttanh(input * driveGain);
-        
+
         hp = (input - (2.0*r+g)*z1-z2)/(1.0+2.0*r*g+g*g);
         bp = g*hp+z1;
         bp = tanh(1.0*bp + 1e-18); //Nonlinear processing from pg353 of pirkle plugin book.
         lp = g*bp+z2;
         lp = tanh(1.0*lp + 1e-18); //Martijn suggests adding second tanh saturator to second integrator
         br = hp + lp;
-        
+
         z1 = g*hp + bp;
         z2 = g*bp + lp;
-        
+
         if(filterType == 4.0){
             return br;
         }
@@ -102,8 +105,9 @@ public:
             return hp;
         }
     }
-    
+
 private:
+    friend struct ZedLifecycleTestAccess;
     float       filterType = 1.0;
     float       driveGain = 1.0;
     float       lfoModDepth = 12.0; //TODO: 0 this
@@ -112,7 +116,7 @@ private:
     float       envModValue = 1.0;
     float       envelopeInverted = 0.0;
 
-    float       sr = 44100;
+    double       sr = 0.0; // Set by init before processing.
     float       wd = 0.0;
     float       t = 0.0;
     float       wa = 0.0;

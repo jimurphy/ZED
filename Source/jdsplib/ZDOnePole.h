@@ -15,9 +15,12 @@
 class ZDOnePole{
 
 public:
+    // Clear audio history while retaining coefficients and controls.
+    inline void reset() noexcept { z = 0.0f; }
+
     ZDOnePole(){
     }
-    
+
     ~ZDOnePole(){};
 
     int filterType = LPF1;
@@ -25,15 +28,15 @@ public:
     float ff = 1.0f; //Feedforward coeff
     float fb = 1.0f; //Feedback coeff
 
-    inline void init(float samplerate){
+    inline void init(double samplerate){
         sr = samplerate;
         updateFilter();
     }
-    
+
     inline float getFeedbackOutput(){
         return(z * fb);
     }
-    
+
     inline void setCutoff(float co){
         cutoff = co;
         updateFilter();
@@ -46,7 +49,7 @@ public:
         float g  = wa*T/2;
         ff = g/(1.0 + g);
     }
-    
+
     inline float dsp(float input){
         float vn = (input - z)*ff;
 
@@ -63,13 +66,14 @@ public:
 
         return lpf;
     }
-    
+
     inline float getZ(){
         return z;
     }
-    
+
 private:
-    float sr = 44100;
+    friend struct ZedLifecycleTestAccess;
+    double sr = 0.0; // Set by init before processing.
     float cutoff = 0.0f;
     float z = 0.0f;
 };
