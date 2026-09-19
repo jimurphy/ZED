@@ -76,4 +76,15 @@ if(ZED_BUILD_TESTS)
     )
     target_link_libraries(ZEDChannelTests PRIVATE ZED ZEDBinaryData juce::juce_audio_utils)
     add_test(NAME ZEDChannelLayouts COMMAND ZEDChannelTests)
+
+    # Measurement-only executable. Its test access uses existing private friendship;
+    # neither production sources nor normal plug-in target options are changed.
+    add_executable(ZEDStabilityCharacterisation Tests/StabilityCharacterisation.cpp)
+    target_include_directories(ZEDStabilityCharacterisation PRIVATE
+        Source Source/jdsplib
+        "$<TARGET_PROPERTY:ZED,JUCE_GENERATED_SOURCES_DIRECTORY>"
+    )
+    target_link_libraries(ZEDStabilityCharacterisation PRIVATE ZED ZEDBinaryData juce::juce_audio_utils)
+    add_test(NAME ZEDStabilityToolSmoke COMMAND ZEDStabilityCharacterisation
+        --mode smoke --output "${CMAKE_CURRENT_BINARY_DIR}/stability-smoke")
 endif()
