@@ -4,7 +4,7 @@
   "configurePresets": [
     {
       "name": "macos-arm64-release",
-      "displayName": "macOS arm64 Release VST3",
+      "displayName": "macOS arm64 Release VST3 and AU",
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/macos-arm64-release",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
@@ -21,7 +21,7 @@
       "name": "macos-arm64-release",
       "configurePreset": "macos-arm64-release",
       "configuration": "Release",
-      "targets": ["ZED_VST3"]
+      "targets": ["ZED_VST3", "ZED_AU"]
     }
   ]
 }
