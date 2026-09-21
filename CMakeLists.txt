@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
 
+# Set macOS defaults before compiler detection; leave Windows/MSVC untouched.
+if(CMAKE_HOST_APPLE AND (NOT DEFINED CMAKE_SYSTEM_NAME OR CMAKE_SYSTEM_NAME STREQUAL "Darwin"))
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "ZED macOS architecture")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "ZED minimum macOS version")
+endif()
+
 project(ZED VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,7 +21,13 @@ FetchContent_Declare(JUCE
 )
 FetchContent_MakeAvailable(JUCE)
 
+set(ZED_PLUGIN_FORMATS VST3)
+if(APPLE)
+    list(APPEND ZED_PLUGIN_FORMATS AU)
+endif()
+
 juce_add_plugin(ZED
+    VERSION "${PROJECT_VERSION}"
     COMPANY_NAME "South Coast Synthesis"
     COMPANY_COPYRIGHT "southcoastsynthesis"
     BUNDLE_ID com.SouthCoastSynthesis.ZED
@@ -23,8 +35,10 @@ juce_add_plugin(ZED
     PLUGIN_CODE Zedd
     PRODUCT_NAME "ZED"
     DESCRIPTION "ZED"
-    FORMATS VST3
+    FORMATS ${ZED_PLUGIN_FORMATS}
     VST3_CATEGORIES Fx Filter
+    AU_MAIN_TYPE kAudioUnitType_Effect
+    AU_EXPORT_PREFIX ZEDAU
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
@@ -48,6 +62,8 @@ target_compile_definitions(ZED PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
 )
+# JUCE 8.0.6 has no historical splash screen. JUCE_DISPLAY_SPLASH_SCREEN is
+# obsolete in this pinned release and defining it emits an ignored-flag warning.
 target_link_libraries(ZED PRIVATE
     ZEDBinaryData
     juce::juce_audio_utils
@@ -55,12 +71,16 @@ target_link_libraries(ZED PRIVATE
 )
 
 if(APPLE)
-    # JUCE 8.0.6 writes moduleinfo.json after its signing step. Seal the final
-    # bundle, including that manifest, for local native macOS host testing.
-    add_custom_command(TARGET ZED_VST3 POST_BUILD
-        COMMAND /usr/bin/codesign --force --sign - "$<TARGET_BUNDLE_DIR:ZED_VST3>"
-        VERBATIM
-    )
+    # Seal both completed bundles for local native testing. JUCE writes the
+    # VST3 manifest after its signing step; AU otherwise has a linker-only seal.
+    # Ad-hoc only: no signing identity, timestamp or notarisation.
+    foreach(zed_format IN ITEMS VST3 AU)
+        add_custom_command(TARGET ZED_${zed_format} POST_BUILD
+            COMMAND /usr/bin/codesign --force --sign - --timestamp=none
+                "$<TARGET_BUNDLE_DIR:ZED_${zed_format}>"
+            VERBATIM
+        )
+    endforeach()
 endif()
 
 option(ZED_BUILD_TESTS "Build the focused channel-layout regression test" OFF)
