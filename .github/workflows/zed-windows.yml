@@ -1,0 +1,70 @@
+name: ZED Windows build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  windows-vst3:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Print tool versions
+        run: |
+          cmake --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $PSVersionTable
+          & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -format json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # CMake fetches the pinned JUCE release; no checkout submodules are needed.
+      # Compiler identification/version is also printed during configuration.
+      - name: Configure ZED for MSVC x64
+        run: cmake -S ZED -B ZED/build/windows-x64-release -G "Visual Studio 17 2022" -A x64 -DZED_BUILD_TESTS=ON
+
+      - name: Build Release VST3
+        run: cmake --build ZED/build/windows-x64-release --config Release --target ZED_VST3 --parallel 4
+
+      - name: Build regression tests
+        run: cmake --build ZED/build/windows-x64-release --config Release --target ZEDChannelTests ZEDStabilityCharacterisation --parallel 4
+
+      - name: Run Release regression tests
+        run: ctest --test-dir ZED/build/windows-x64-release -C Release --output-on-failure --no-tests=error
+
+      - name: Prepare complete VST3 bundle for upload
+        run: |
+          $bundle = Resolve-Path "ZED/build/windows-x64-release/ZED_artefacts/Release/VST3/ZED.vst3" -ErrorAction Stop
+          Write-Host "Built VST3 bundle: $bundle"
+          $binary = Join-Path $bundle "Contents/x86_64-win/ZED.vst3"
+          if (-not (Test-Path $binary -PathType Leaf)) {
+            throw "Expected Windows x64 VST3 executable is missing: $binary"
+          }
+          # Upload a dedicated parent so the archive retains ZED.vst3/ itself,
+          # without including other build products from the artefacts directory.
+          $upload = "ZED/build/windows-x64-release/upload"
+          New-Item -ItemType Directory -Path $upload -ErrorAction Stop | Out-Null
+          Copy-Item -LiteralPath $bundle.Path -Destination $upload -Recurse -ErrorAction Stop
+
+      - name: Upload ZED VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZED-1.0.0-Windows-x64-VST3
+          path: ZED/build/windows-x64-release/upload/
+          if-no-files-found: error
+          retention-days: 14
