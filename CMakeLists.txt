@@ -62,6 +62,10 @@ target_compile_definitions(ZED PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
 )
+if(MSVC)
+    # Expose M_PI before math headers, including in tests using ZED's DSP headers.
+    target_compile_definitions(ZED PUBLIC _USE_MATH_DEFINES)
+endif()
 # JUCE 8.0.6 has no historical splash screen. JUCE_DISPLAY_SPLASH_SCREEN is
 # obsolete in this pinned release and defining it emits an ignored-flag warning.
 target_link_libraries(ZED PRIVATE
