@@ -72,24 +72,69 @@ if (Test-Path -LiteralPath $output) {
 }
 
 $candidates = @()
-$onPath = Get-Command ISCC.exe -CommandType Application -ErrorAction SilentlyContinue
-if ($onPath) { $candidates += $onPath.Source }
+$onPath = @(Get-Command ISCC.exe -All -CommandType Application -ErrorAction SilentlyContinue)
+foreach ($command in $onPath) { $candidates += $command.Source }
 foreach ($base in @(${env:ProgramFiles(x86)}, $env:ProgramFiles)) {
     if ($base) {
         $candidate = Join-Path $base 'Inno Setup 6/ISCC.exe'
-        if (Test-Path -LiteralPath $candidate -PathType Leaf) { $candidates += $candidate }
+        $candidates += $candidate
     }
 }
-$compatible = @($candidates | Select-Object -Unique | Where-Object {
-    $v = [Diagnostics.FileVersionInfo]::GetVersionInfo($_)
-    $v.FileMajorPart -eq 6 -and $v.FileMinorPart -eq 7
-})
+# Resolve before deduplication: PATH and known folders can spell the same file
+# differently. A Chocolatey shim is a launcher, not the compiler to version-check.
+$compatible = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$chocolateyBin = if ($env:ChocolateyInstall) {
+    [IO.Path]::GetFullPath((Join-Path $env:ChocolateyInstall 'bin')).TrimEnd('\')
+} else { $null }
+foreach ($raw in $candidates) {
+    $canonical = '<unresolved>'
+    $fileVersion = '<unavailable>'
+    $productVersion = '<unavailable>'
+    $passes = $false
+    $reason = 'Candidate does not exist as a file'
+    try {
+        if (Test-Path -LiteralPath $raw -PathType Leaf) {
+            $resolved = Resolve-Path -LiteralPath $raw -ErrorAction Stop
+            if ($resolved.Provider.Name -ne 'FileSystem') { throw 'Not a filesystem path.' }
+            $item = Get-Item -LiteralPath $resolved.ProviderPath -ErrorAction Stop
+            $canonical = [IO.Path]::GetFullPath($item.FullName).Replace('/', '\')
+            $v = [Diagnostics.FileVersionInfo]::GetVersionInfo($canonical)
+            $fileVersion = $v.FileVersion
+            $productVersion = $v.ProductVersion
+            $metadata = "$($v.ProductName) $($v.FileDescription) $($v.CompanyName)"
+            $isShim = $metadata -match '(?i)chocolatey|shimgen' -or
+                ($chocolateyBin -and (Split-Path -Parent $canonical) -eq $chocolateyBin)
+            $compilerLibrary = Join-Path (Split-Path -Parent $canonical) 'ISCmplr.dll'
+            if ($isShim) {
+                $reason = 'Chocolatey shim excluded; real compiler is discovered through installation folders'
+            } elseif (-not (Test-Path -LiteralPath $compilerLibrary -PathType Leaf)) {
+                $reason = 'Not a full Inno Setup compiler installation: ISCmplr.dll missing'
+            } elseif ($v.FileMajorPart -ne 6 -or $v.FileMinorPart -ne 7 -or
+                $v.ProductMajorPart -ne 6 -or $v.ProductMinorPart -ne 7) {
+                $reason = 'File and product versions must both be 6.7.x'
+            } else {
+                $passes = $true
+                if ($compatible.Add($canonical)) { $reason = 'Compatible canonical compiler' }
+                else { $reason = 'Duplicate route to the same compatible canonical compiler' }
+            }
+        }
+    } catch {
+        $reason = "Candidate inspection failed: $($_.Exception.Message)"
+    }
+    Write-Host "Raw candidate: $raw"
+    Write-Host "  Canonical path: $canonical"
+    Write-Host "  File version: $fileVersion"
+    Write-Host "  Product version: $productVersion"
+    Write-Host "  Compatible 6.7.x: $passes; $reason"
+}
+Write-Host "Canonical compatible-candidate count: $($compatible.Count)"
 if ($compatible.Count -ne 1) {
     throw 'Expected exactly one Inno Setup 6.7.x ISCC.exe on PATH or in Program Files. No compiler will be downloaded.'
 }
-$compiler = $compatible[0]
+$compiler = @($compatible)[0]
 Write-Host "Inno Setup compiler: $compiler"
 Write-Host "Version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).FileVersion)"
+Write-Host "Product version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).ProductVersion)"
 Write-Host "Validated Release-layout AMD64 VST3: $bundle"
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 $definition = Join-Path $repo 'ZED/installer/windows/ZED.iss'
