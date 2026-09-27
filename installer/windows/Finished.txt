@@ -1,0 +1,8 @@
+ZED 1.0.0 RC1
+
+The VST3 plug-in is installed for all users in Common Files\VST3\ZED.vst3.
+Restart your DAW. If ZED does not appear, rescan VST3 plug-ins in the DAW settings.
+Use a native x64 DAW on Windows 10 or Windows 11.
+
+To uninstall, close all DAWs and remove ZED through Windows Installed Apps
+(Apps & features on Windows 10).
