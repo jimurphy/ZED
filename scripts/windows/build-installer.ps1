@@ -82,7 +82,7 @@ foreach ($base in @(${env:ProgramFiles(x86)}, $env:ProgramFiles)) {
 }
 # Resolve before deduplication: PATH and known folders can spell the same file
 # differently. A Chocolatey shim is a launcher, not the compiler to version-check.
-$compatible = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$installations = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 $chocolateyBin = if ($env:ChocolateyInstall) {
     [IO.Path]::GetFullPath((Join-Path $env:ChocolateyInstall 'bin')).TrimEnd('\')
 } else { $null }
@@ -109,13 +109,10 @@ foreach ($raw in $candidates) {
                 $reason = 'Chocolatey shim excluded; real compiler is discovered through installation folders'
             } elseif (-not (Test-Path -LiteralPath $compilerLibrary -PathType Leaf)) {
                 $reason = 'Not a full Inno Setup compiler installation: ISCmplr.dll missing'
-            } elseif ($v.FileMajorPart -ne 6 -or $v.FileMinorPart -ne 7 -or
-                $v.ProductMajorPart -ne 6 -or $v.ProductMinorPart -ne 7) {
-                $reason = 'File and product versions must both be 6.7.x'
             } else {
                 $passes = $true
-                if ($compatible.Add($canonical)) { $reason = 'Compatible canonical compiler' }
-                else { $reason = 'Duplicate route to the same compatible canonical compiler' }
+                if ($installations.Add($canonical)) { $reason = 'Canonical compiler installation; engine version requires probe' }
+                else { $reason = 'Duplicate route to the same canonical compiler installation' }
             }
         }
     } catch {
@@ -125,20 +122,67 @@ foreach ($raw in $candidates) {
     Write-Host "  Canonical path: $canonical"
     Write-Host "  File version: $fileVersion"
     Write-Host "  Product version: $productVersion"
-    Write-Host "  Compatible 6.7.x: $passes; $reason"
+    Write-Host "  Installation candidate: $passes; $reason"
 }
-Write-Host "Canonical compatible-candidate count: $($compatible.Count)"
-if ($compatible.Count -ne 1) {
-    throw 'Expected exactly one Inno Setup 6.7.x ISCC.exe on PATH or in Program Files. No compiler will be downloaded.'
+Write-Host "Canonical compiler-installation count: $($installations.Count)"
+if ($installations.Count -ne 1) {
+    throw 'Expected exactly one real ISCC.exe installation with ISCmplr.dll. No compiler will be downloaded.'
 }
-$compiler = @($compatible)[0]
+$compiler = @($installations)[0]
 Write-Host "Inno Setup compiler: $compiler"
 Write-Host "Version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).FileVersion)"
 Write-Host "Product version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).ProductVersion)"
 Write-Host "Validated Release-layout AMD64 VST3: $bundle"
-New-Item -ItemType Directory -Path $output -Force | Out-Null
 $definition = Join-Path $repo 'ZED/installer/windows/ZED.iss'
-& $compiler "/DBundleSource=$bundle" "/DInstallerOutput=$output" $definition
+$compilerArguments = @("/DBundleSource=$bundle", "/DInstallerOutput=$output", $definition)
+# ISCC 6.7.x can have 0.0.0.0 version resources. Its exact engine version is
+# printed only after loading ISCmplr.dll for compilation. /O- disables output.
+# Capture both streams independently, without PowerShell native-error preferences
+# hiding the compiler's diagnostics or replacing its actual exit code.
+Write-Host 'Probing compiler engine with /O- (no installer output)'
+$startInfo = [Diagnostics.ProcessStartInfo]::new()
+$startInfo.FileName = $compiler
+$startInfo.UseShellExecute = $false
+$startInfo.RedirectStandardOutput = $true
+$startInfo.RedirectStandardError = $true
+$startInfo.ArgumentList.Add('/O-')
+foreach ($argument in $compilerArguments) { $startInfo.ArgumentList.Add($argument) }
+$probe = [Diagnostics.Process]::new()
+$probe.StartInfo = $startInfo
+try {
+    if (-not $probe.Start()) { throw 'Could not start the no-output compiler probe.' }
+    $stdoutTask = $probe.StandardOutput.ReadToEndAsync()
+    $stderrTask = $probe.StandardError.ReadToEndAsync()
+    $probe.WaitForExit()
+    $probeStdout = $stdoutTask.GetAwaiter().GetResult()
+    $probeStderr = $stderrTask.GetAwaiter().GetResult()
+    $probeExitCode = $probe.ExitCode
+} finally {
+    $probe.Dispose()
+}
+Write-Host "Probe stdout:`n$probeStdout"
+Write-Host "Probe stderr:`n$probeStderr"
+Write-Host "No-output probe exit code: $probeExitCode"
+if ($probeExitCode -ne 0) { throw "No-output compilation probe failed with exit code $probeExitCode." }
+$engineMatches = [regex]::Matches("$probeStdout`n$probeStderr",
+    '(?m)^\s*Compiler engine version:\s*Inno Setup\s+(\d+\.\d+\.\d+(?:\.\d+)?)(?![\d.])[^\r\n]*\r?$')
+if ($engineMatches.Count -ne 1) { throw 'Expected exactly one precise compiler-engine version line in probe output.' }
+[version]$engineVersion = $null
+if (-not [version]::TryParse($engineMatches[0].Groups[1].Value, [ref]$engineVersion)) {
+    throw 'Could not parse the compiler-engine numeric version.'
+}
+Write-Host "Detected compiler-engine version: $engineVersion"
+if ($engineVersion.Major -ne 6 -or $engineVersion.Minor -ne 7) {
+    throw "Inno Setup 6.7.x is required; detected engine $engineVersion."
+}
+if (Test-Path -LiteralPath $output) {
+    if (-not (Test-Path -LiteralPath $output -PathType Container) -or
+        @(Get-ChildItem -LiteralPath $output -Force).Count -ne 0) {
+        throw 'Output directory is no longer absent or empty after the no-output probe.'
+    }
+}
+New-Item -ItemType Directory -Path $output -Force | Out-Null
+& $compiler @compilerArguments
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed with exit code $LASTEXITCODE." }
 $name = 'ZED-1.0.0-rc.1-Windows-x64-Setup.exe'
 $installer = Join-Path $output $name
