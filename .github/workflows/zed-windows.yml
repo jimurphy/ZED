@@ -68,3 +68,26 @@ jobs:
           path: ZED/build/windows-x64-release/upload/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Build unsigned Windows installer
+        run: >-
+          ./scripts/windows/build-installer.ps1
+          -BundlePath ZED/build/windows-x64-release/ZED_artefacts/Release/VST3/ZED.vst3
+          -OutputDirectory ZED/build/windows-x64-release/installer
+
+      - name: Validate installer mechanics on disposable runner
+        run: >-
+          ./scripts/windows/test-installer.ps1
+          -BundlePath ZED/build/windows-x64-release/ZED_artefacts/Release/VST3/ZED.vst3
+          -InstallerPath ZED/build/windows-x64-release/installer/ZED-1.0.0-rc.1-Windows-x64-Setup.exe
+          -LogDirectory ZED/build/windows-x64-release/installer-validation
+
+      - name: Upload ZED installer and checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZED-1.0.0-rc.1-Windows-x64-Installer
+          path: |
+            ZED/build/windows-x64-release/installer/ZED-1.0.0-rc.1-Windows-x64-Setup.exe
+            ZED/build/windows-x64-release/installer/ZED-1.0.0-rc.1-Windows-x64-Setup.exe.sha256
+          if-no-files-found: error
+          retention-days: 14
