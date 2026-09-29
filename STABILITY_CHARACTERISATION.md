@@ -1,5 +1,9 @@
 # ZED stability characterisation
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 ZED is tested and supported at **44.1, 48, 88.2, 96 and 192 kHz**.
 Other sample rates are permitted but are outside the supported specification.
 The internal 32 kHz findings are retained below; no production DSP correction
@@ -9,7 +13,7 @@ was required for this milestone and none was made.
 
 This is an investigation of existing DSP, not a correction. The branch
 `zed-stability-characterisation` began at clean, fetched `origin/master`
-`99cc3472e0f05b513d5c641448f182a53a7edfad`. Production files, existing tests,
+`4324fecd5ef2dacadb94460c1ad8fc32324dde87`. Production files, existing tests,
 parameter contracts, JUCE pin and normal plug-in configuration are unchanged.
 Only the optional measurement executable, its summary script, CMake registration
 inside `ZED_BUILD_TESTS`, and this report are new. No production API was added:
@@ -392,55 +396,55 @@ the new build instead. These are reproducible commands for the final sources;
 the extended/settling modes were added after inspecting the initial results.
 
 ```sh
-mkdir -p ZED/build/stability-characterisation-results/tmp
-export TMPDIR="$PWD/ZED/build/stability-characterisation-results/tmp"
+mkdir -p build/stability-characterisation-results/tmp
+export TMPDIR="$PWD/build/stability-characterisation-results/tmp"
 
-cmake -S ZED -B ZED/build/stability-characterisation-release \
+cmake -S . -B build/stability-characterisation-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
-  > ZED/build/stability-characterisation-results/release-configure.log 2>&1
-cmake --build ZED/build/stability-characterisation-release \
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
+  > build/stability-characterisation-results/release-configure.log 2>&1
+cmake --build build/stability-characterisation-release \
   --target ZEDStabilityCharacterisation ZEDChannelTests --parallel 4 \
-  > ZED/build/stability-characterisation-results/release-build.log 2>&1
-ctest --test-dir ZED/build/stability-characterisation-release --output-on-failure \
-  > ZED/build/stability-characterisation-results/release-ctest.log 2>&1
+  > build/stability-characterisation-results/release-build.log 2>&1
+ctest --test-dir build/stability-characterisation-release --output-on-failure \
+  > build/stability-characterisation-results/release-ctest.log 2>&1
 for mode in matrix mechanics boundaries oscillation extended out-of-spec; do
-  ZED/build/stability-characterisation-release/ZEDStabilityCharacterisation \
-    --mode "$mode" --output ZED/build/stability-characterisation-results/release \
-    > "ZED/build/stability-characterisation-results/release-$mode.log" 2>&1 || exit 1
+  build/stability-characterisation-release/ZEDStabilityCharacterisation \
+    --mode "$mode" --output build/stability-characterisation-results/release \
+    > "build/stability-characterisation-results/release-$mode.log" 2>&1 || exit 1
 done
-python3 ZED/Tests/SummariseStability.py ZED/build/stability-characterisation-results/release
+python3 Tests/SummariseStability.py build/stability-characterisation-results/release
 
-cmake -S ZED -B ZED/build/stability-characterisation-asan \
+cmake -S . -B build/stability-characterisation-asan \
   -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
   -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
   -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
   -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address \
-  > ZED/build/stability-characterisation-results/asan-configure.log 2>&1
-cmake --build ZED/build/stability-characterisation-asan \
+  > build/stability-characterisation-results/asan-configure.log 2>&1
+cmake --build build/stability-characterisation-asan \
   --target ZEDStabilityCharacterisation ZEDChannelTests --parallel 4 \
-  > ZED/build/stability-characterisation-results/asan-build.log 2>&1
-ASAN_OPTIONS=detect_leaks=0 ctest --test-dir ZED/build/stability-characterisation-asan --output-on-failure \
-  > ZED/build/stability-characterisation-results/asan-ctest.log 2>&1
+  > build/stability-characterisation-results/asan-build.log 2>&1
+ASAN_OPTIONS=detect_leaks=0 ctest --test-dir build/stability-characterisation-asan --output-on-failure \
+  > build/stability-characterisation-results/asan-ctest.log 2>&1
 for mode in matrix mechanics boundaries oscillation extended out-of-spec; do
   ASAN_OPTIONS=detect_leaks=0 \
-    ZED/build/stability-characterisation-asan/ZEDStabilityCharacterisation \
-    --mode "$mode" --output ZED/build/stability-characterisation-results/asan \
-    > "ZED/build/stability-characterisation-results/asan-$mode.log" 2>&1 || exit 1
+    build/stability-characterisation-asan/ZEDStabilityCharacterisation \
+    --mode "$mode" --output build/stability-characterisation-results/asan \
+    > "build/stability-characterisation-results/asan-$mode.log" 2>&1 || exit 1
 done
-python3 ZED/Tests/SummariseStability.py ZED/build/stability-characterisation-results/asan
+python3 Tests/SummariseStability.py build/stability-characterisation-results/asan
 
-cmake -S ZED -B ZED/build/stability-characterisation-normal-config \
+cmake -S . -B build/stability-characterisation-normal-config \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=OFF \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
-  > ZED/build/stability-characterisation-results/normal-configure.log 2>&1
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
+  > build/stability-characterisation-results/normal-configure.log 2>&1
 git diff --check
-git diff --exit-code HEAD -- ZED/Source
-git ls-files ZED/build
+git diff --exit-code HEAD -- Source
+git ls-files build
 git status --short --branch
 ```
 

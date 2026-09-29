@@ -496,7 +496,9 @@ int main(int argc,char** argv)
         require(!output.empty(),"Output directory required");
         // All reproducible measurements belong to the project's ignored build tree.
         auto canonical=std::filesystem::weakly_canonical(output).generic_string();
-        require(canonical.find("/ZED/build/")!=std::string::npos,"Output must be beneath ZED/build/");
+        const auto build=std::filesystem::weakly_canonical(
+            std::filesystem::path(__FILE__).parent_path().parent_path()/"build").generic_string()+"/";
+        require(canonical.compare(0,build.size(),build)==0,"Output must be beneath the repository build/ directory");
         std::filesystem::create_directories(output);
         juce::ScopedJuceInitialiser_GUI init;
         smoke();

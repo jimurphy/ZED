@@ -47,12 +47,12 @@ Run locally on a suitable Windows machine with PowerShell 7:
 
 ```powershell
 ./scripts/windows/build-installer.ps1 `
-  -BundlePath ZED/build/windows-x64-release/ZED_artefacts/Release/VST3/ZED.vst3 `
-  -OutputDirectory ZED/build/windows-x64-release/installer
+  -BundlePath build/windows-x64-release/ZED_artefacts/Release/VST3/ZED.vst3 `
+  -OutputDirectory build/windows-x64-release/installer
 ```
 
 Both parameters are required. The output directory must be absent or empty and,
-if inside this repository, beneath ignored `ZED/build`. The script validates the
+if inside this repository, beneath ignored `build`. The script validates the
 established Release path, unique VST3 binary, PE AMD64/PE32+ DLL headers, non-debug
 1.0.0 version resources and VST3 manifest. These checks cannot prove compiler
 optimization provenance for an arbitrary renamed binary; the authoritative source
@@ -70,16 +70,16 @@ Actions artifacts (14-day retention):
 - `ZED-1.0.0-rc.1-Windows-x64-Installer` — installer and checksum, uploaded only
   after installer mechanics pass. No build tree or logs are uploaded.
 
-Triggers are unchanged: manual `workflow_dispatch`, PRs targeting `master`, and
-pushes to `master`. After this feature branch is pushed, choose **Actions → ZED
-Windows build → Run workflow → zed-rc1-windows-installer**, or run:
+The workflow is manual-only (`workflow_dispatch`). Once this repository is pushed
+with `main` as its default branch, choose **Actions → ZED Windows build → Run
+workflow → main**, or run:
 
 ```sh
-gh workflow run zed-windows.yml --ref zed-rc1-windows-installer
+gh workflow run zed-windows.yml --ref main
 ```
 
-The existing dispatch workflow is already on master, so it can select the feature
-branch. No write permissions, signing secrets or publication steps are needed.
+No push or pull-request event starts the workflow. No write permissions, signing
+secrets or publication steps are needed.
 
 ## Disposable-runner checks and manual acceptance
 
@@ -90,7 +90,7 @@ restart request as failure. It checks all installed file paths and SHA-256 hashe
 against the built bundle, including `Contents\x86_64-win\ZED.vst3`, then invokes
 the unique generated uninstaller silently and requires both ZED directories to
 be removed. Cleanup is attempted even if installed-file verification fails.
-Logs stay under `ZED/build/windows-x64-release/installer-validation`. The test
+Logs stay under `build/windows-x64-release/installer-validation`. The test
 does not launch a DAW. Windows Server 2022 CI tests installer mechanics; it does
 not establish Windows 10/11 DAW compatibility.
 

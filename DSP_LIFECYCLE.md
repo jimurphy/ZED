@@ -1,7 +1,11 @@
 # DSP lifecycle and host sample rate
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Branch: `zed-dsp-lifecycle-sample-rate`. Baseline: clean, fetched master
-`e548da326ae94198d3d392d5faaf3959af0c6625`. Validation: 2026-09-18.
+`555d03795b7c8c6022e6f232ad6ad3390d8d6cc9`. Validation: 2026-09-18.
 No parameter, configuration ordering, bus policy, GUI, metadata, JUCE revision,
 filter equations, per-sample update order or topology-switch policy changes.
 
@@ -172,46 +176,46 @@ for arbitrary parameter trajectories, switching histories or non-44.1 kHz rates.
 ## Reproduction commands
 
 Run from the repository root; choose new directory names if these already exist.
-All generated data, logs and tools belong under ignored `ZED/build/`, never Git.
+All generated data, logs and tools belong under ignored `build/`, never Git.
 Tools: CMake 4.4.3, Apple Clang 17.0.0 (`clang-1700.6.4.2`), Xcode 26.3
 (`17C529`), SDK 26.2, JUCE 8.0.6 commit
 `51a8a6d7aeae7326956d747737ccf1575e61e209` (unchanged).
 
 ```sh
-mkdir -p ZED/build/lifecycle-validation/tmp
-export TMPDIR="$PWD/ZED/build/lifecycle-validation/tmp"
-ZED_JUCE_SOURCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src"
+mkdir -p build/lifecycle-validation/tmp
+export TMPDIR="$PWD/build/lifecycle-validation/tmp"
+ZED_JUCE_SOURCE="$PWD/build/macos-arm64-release/_deps/juce-src"
 
-cmake -S ZED -B ZED/build/lifecycle-tests-release \
+cmake -S . -B build/lifecycle-tests-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/lifecycle-tests-release --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/lifecycle-tests-release --output-on-failure
+cmake --build build/lifecycle-tests-release --target ZEDChannelTests --parallel 4
+ctest --test-dir build/lifecycle-tests-release --output-on-failure
 
-cmake -S ZED -B ZED/build/lifecycle-debug-asan \
+cmake -S . -B build/lifecycle-debug-asan \
   -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE" \
   -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_CXX_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address
-cmake --build ZED/build/lifecycle-debug-asan --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/lifecycle-debug-asan --output-on-failure
+cmake --build build/lifecycle-debug-asan --target ZEDChannelTests --parallel 4
+ctest --test-dir build/lifecycle-debug-asan --output-on-failure
 
-cmake -S ZED -B ZED/build/lifecycle-release \
+cmake -S . -B build/lifecycle-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=OFF \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/lifecycle-release --target ZED_VST3 --parallel 4
-ZED_BUNDLE="$PWD/ZED/build/lifecycle-release/ZED_artefacts/Release/VST3/ZED.vst3"
+cmake --build build/lifecycle-release --target ZED_VST3 --parallel 4
+ZED_BUNDLE="$PWD/build/lifecycle-release/ZED_artefacts/Release/VST3/ZED.vst3"
 lipo -archs "$ZED_BUNDLE/Contents/MacOS/ZED"
 codesign --verify --deep --strict --verbose=2 "$ZED_BUNDLE"
 /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$ZED_BUNDLE/Contents/Info.plist"
 # Reuse the previously verified official pluginval 1.0.4 app, copied into this directory.
-arch -arm64 ZED/build/lifecycle-validation/tools/pluginval.app/Contents/MacOS/pluginval \
+arch -arm64 build/lifecycle-validation/tools/pluginval.app/Contents/MacOS/pluginval \
   --strictness-level 5 --random-seed 12345 \
-  --output-dir "$PWD/ZED/build/lifecycle-validation" \
+  --output-dir "$PWD/build/lifecycle-validation" \
   --output-filename pluginval-tests.txt --validate "$ZED_BUNDLE"
 git diff --check
 ```
@@ -224,30 +228,30 @@ was performed. Existing build directories were not modified.
 ### Baseline and comparison
 
 ```sh
-mkdir -p ZED/build/lifecycle-master-reference
-git archive e548da326ae94198d3d392d5faaf3959af0c6625 ZED | \
-  tar -x -C ZED/build/lifecycle-master-reference
+mkdir -p build/lifecycle-master-reference
+git archive 555d03795b7c8c6022e6f232ad6ad3390d8d6cc9 | \
+  tar -x -C build/lifecycle-master-reference
 python3 - <<'PY'
 from pathlib import Path
-p = Path('ZED/build/lifecycle-master-reference/ZED/Tests/ChannelLayouts.cpp')
+p = Path('build/lifecycle-master-reference/Tests/ChannelLayouts.cpp')
 p.write_text(p.read_text().replace('48000.0', '44100.0'))
 PY
-cmake -S ZED/build/lifecycle-master-reference/ZED \
-  -B ZED/build/lifecycle-master-reference/build \
+cmake -S build/lifecycle-master-reference \
+  -B build/lifecycle-master-reference/build \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/lifecycle-master-reference/build --target ZEDChannelTests --parallel 4
-ZED/build/lifecycle-master-reference/build/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
-  --dump-configurations ZED/build/lifecycle-master-reference/output
-ZED/build/lifecycle-tests-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
-  --dump-44100 ZED/build/lifecycle-validation/current-output
+cmake --build build/lifecycle-master-reference/build --target ZEDChannelTests --parallel 4
+build/lifecycle-master-reference/build/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+  --dump-configurations build/lifecycle-master-reference/output
+build/lifecycle-tests-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+  --dump-44100 build/lifecycle-validation/current-output
 python3 - <<'PY'
 from pathlib import Path
 import struct
-for p in sorted(Path('ZED/build/lifecycle-master-reference/output').glob('*.bin')):
+for p in sorted(Path('build/lifecycle-master-reference/output').glob('*.bin')):
     a = p.read_bytes()
-    b = (Path('ZED/build/lifecycle-validation/current-output') / p.name).read_bytes()
+    b = (Path('build/lifecycle-validation/current-output') / p.name).read_bytes()
     assert len(a) == len(b) == 68320
     x, y = (struct.unpack('<17080f', data) for data in (a, b))
     print(p.stem, 'byte-identical' if a == b else 'different', max(abs(i-j) for i,j in zip(x,y)))
@@ -264,9 +268,10 @@ binary and output remain separate. To recreate the diagnostic copy:
 python3 - <<'PYCONTROL'
 from pathlib import Path
 import shutil
-base=Path('ZED/build/lifecycle-master-reference')
+base=Path('build/lifecycle-master-reference')
 control=base/'startup-control'
-shutil.copytree(base/'ZED',control)
+shutil.copytree(base,control,ignore=shutil.ignore_patterns(
+    'startup-control', 'build', 'output', 'startup-control-build', 'startup-control-output'))
 p=control/'Source/jdsplib/OnePoleLP.h'
 s=p.read_text().replace('public:', 'public:\n    void reset(float value) { z1 = value; }',1)
 p.write_text(s)
@@ -281,18 +286,18 @@ s=s.replace(needle,needle+'''
 ''')
 p.write_text(s)
 PYCONTROL
-cmake -S ZED/build/lifecycle-master-reference/startup-control \
-  -B ZED/build/lifecycle-master-reference/startup-control-build \
+cmake -S build/lifecycle-master-reference/startup-control \
+  -B build/lifecycle-master-reference/startup-control-build \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/lifecycle-master-reference/startup-control-build \
+cmake --build build/lifecycle-master-reference/startup-control-build \
   --target ZEDChannelTests --parallel 4
-ZED/build/lifecycle-master-reference/startup-control-build/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
-  --dump-configurations ZED/build/lifecycle-master-reference/startup-control-output
+build/lifecycle-master-reference/startup-control-build/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+  --dump-configurations build/lifecycle-master-reference/startup-control-output
 for name in 0-0 0-1 0-2 0-3 1-0 1-1 2-0 3-0; do
-  cmp "ZED/build/lifecycle-master-reference/startup-control-output/$name.bin" \
-      "ZED/build/lifecycle-validation/current-output/$name.bin" || exit 1
+  cmp "build/lifecycle-master-reference/startup-control-output/$name.bin" \
+      "build/lifecycle-validation/current-output/$name.bin" || exit 1
 done
 ```
 

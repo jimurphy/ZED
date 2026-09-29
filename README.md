@@ -1,4 +1,15 @@
-# ZED CMake build
+# ZED
+
+ZED is a multi-model audio filter plug-in by James Murphy / South Coast Synthesis.
+The plug-in version is **1.0.0**, prepared for **1.0.0-rc.1** distribution; no
+release tag or publication is implied. Supported release formats are macOS ARM64
+AU and VST3, and Windows x64 VST3. Explicitly tested sample rates are 44.1, 48,
+88.2, 96 and 192 kHz; other rates are permitted but outside the supported specification.
+
+Build instructions follow below. See [Windows installer documentation](installer/windows/README.md),
+[macOS packaging/notarization instructions](scripts/macos/README.md), and the
+[standalone migration report](MIGRATION.md). Windows installers are currently
+unsigned and may produce SmartScreen / unknown-publisher warnings.
 
 Filter selection now uses the single eight-choice `filterConfiguration`
 parameter. See [the parameter contract and validation](FILTER_CONFIGURATION.md)
@@ -81,6 +92,18 @@ only: no Developer ID, signing certificate, timestamp or notarization is used.
 JUCE 8.0.6 no longer implements the historical "Made with JUCE" splash screen.
 The obsolete `JUCE_DISPLAY_SPLASH_SCREEN` flag is therefore not defined in this
 CMake build; this release emits an ignored-flag warning if it is defined.
-JUCE remains under its own licence (the intended release uses JUCE 8 Starter).
-[LICENSE-DSP.md](LICENSE-DSP.md) grants BSD 3-Clause only for its explicitly
-listed original files; it does not license JUCE, assets or the entire plug-in.
+
+## Licensing
+
+All original ZED code authored by James Murphy is released under the
+[BSD 3-Clause License](LICENSE), copyright 2020–2026 James Murphy. The grant
+excludes JUCE, SDK material, fonts, third-party assets and uncertain third-party
+portions described in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+JUCE remains under its own commercial/open-source dual-licensing system. James
+Murphy's JUCE Starter licence does not transfer to downstream users. Anyone
+building or distributing a JUCE-based derivative must independently arrange and
+comply with their own appropriate JUCE licensing basis. Genuinely JUCE-independent
+original ZED code remains usable under BSD 3-Clause without JUCE; dependencies
+are not transitively relicensed. Font redistribution and mixed DSP provenance
+remain unresolved, as documented in the notices.

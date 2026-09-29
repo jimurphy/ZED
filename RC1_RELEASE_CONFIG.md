@@ -1,5 +1,9 @@
 # ZED 1.0.0 release configuration
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Prepared on `zed-rc1-release-config` from clean, fast-forward-current master
 `c688c33` for an eventual `1.0.0-rc.1`. No RC tag or public release is created.
 The project and host-facing version is **1.0.0**, without an RC suffix.
@@ -13,7 +17,7 @@ version to replace. Legacy generated product versions already say 1.0.0;
 `project(VERSION 1.0.0)` is canonical for this build and is explicitly passed to
 `juce_add_plugin`. Legacy Projucer/IDE files were neither edited nor regenerated.
 The GUI displays no release-version label, so none was added. Neither
-`ZED/docs/USER_GUIDE.md` nor the repository-root `docs/USER_GUIDE.md` existed;
+the former project-level `docs/USER_GUIDE.md` nor the repository-root `docs/USER_GUIDE.md` existed;
 no manual was created or modified.
 
 | Field | Preserved/final value |
@@ -70,7 +74,13 @@ certificate, team identity, secure timestamp, notarisation or installer.
 validation workflow into the normal user-local location described below;
 the build itself installed nothing.
 
-## DSP licence boundary
+## DSP licence boundary (historical audit)
+
+**Superseded scope:** the standalone migration extends BSD 3-Clause to all
+original James Murphy-authored ZED code. The root LICENSE and
+THIRD_PARTY_NOTICES.md now define the grant and exclusions. The narrow grant
+below records the earlier decision, not the current licensing scope. Its
+third-party provenance findings remain unresolved.
 
 [LICENSE-DSP.md](LICENSE-DSP.md) contains the standard BSD 3-Clause text with
 `Copyright (c) 2026 Jim Murphy`. Its exact scope is only:
@@ -104,8 +114,8 @@ change its licensing boundary.
 
 ## Local build and validation
 
-New working directories are `ZED/build/rc1-release` and
-`ZED/build/rc1-validation`. Earlier build directories were not deleted or rebuilt;
+New working directories are `build/rc1-release` and
+`build/rc1-validation`. Earlier build directories were not deleted or rebuilt;
 the pinned JUCE source and existing pluginval application were reused read-only.
 Everything generated remains ignored. Tools: CMake 4.4.3; Apple Clang 17.0.0
 (`clang-1700.6.4.2`); Xcode 26.3 (17C529); macOS 15.7.3 (24G419), native ARM64;
@@ -114,41 +124,41 @@ pluginval 1.0.4; Apple auval 1.10.0.
 Commands, from the repository root:
 
 ```sh
-mkdir -p ZED/build/rc1-validation/tmp
-export TMPDIR="$PWD/ZED/build/rc1-validation/tmp"
-cmake -S ZED -B ZED/build/rc1-release \
+mkdir -p build/rc1-validation/tmp
+export TMPDIR="$PWD/build/rc1-validation/tmp"
+cmake -S . -B build/rc1-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
-  > ZED/build/rc1-validation/configure.log 2>&1
-cmake --build ZED/build/rc1-release \
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
+  > build/rc1-validation/configure.log 2>&1
+cmake --build build/rc1-release \
   --target ZEDChannelTests ZEDStabilityCharacterisation ZED_VST3 ZED_AU --parallel 4 \
-  > ZED/build/rc1-validation/build.log 2>&1
-ctest --test-dir ZED/build/rc1-release --output-on-failure \
-  > ZED/build/rc1-validation/ctest.log 2>&1
+  > build/rc1-validation/build.log 2>&1
+ctest --test-dir build/rc1-release --output-on-failure \
+  > build/rc1-validation/ctest.log 2>&1
 
 # After adding the AU bundle-sealing step (no production source correction):
-cmake --build ZED/build/rc1-release --target ZED_VST3 ZED_AU --parallel 4 \
-  > ZED/build/rc1-validation/bundle-seal-build.log 2>&1
+cmake --build build/rc1-release --target ZED_VST3 ZED_AU --parallel 4 \
+  > build/rc1-validation/bundle-seal-build.log 2>&1
 
-for bundle in ZED/build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3 \
-              ZED/build/rc1-release/ZED_artefacts/Release/AU/ZED.component; do
+for bundle in build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3 \
+              build/rc1-release/ZED_artefacts/Release/AU/ZED.component; do
   lipo -archs "$bundle/Contents/MacOS/ZED"
   xcrun vtool -show-build "$bundle/Contents/MacOS/ZED"
   plutil -lint "$bundle/Contents/Info.plist"
   codesign --verify --deep --strict --verbose=2 "$bundle"
 done
-nm -gU ZED/build/rc1-release/ZED_artefacts/Release/AU/ZED.component/Contents/MacOS/ZED \
+nm -gU build/rc1-release/ZED_artefacts/Release/AU/ZED.component/Contents/MacOS/ZED \
   | rg ZEDAUFactory
-cmp ZED/build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/Resources/moduleinfo.json \
-    ZED/build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/Resources/moduleinfo.json
+cmp build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/Resources/moduleinfo.json \
+    build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/Resources/moduleinfo.json
 
-arch -arm64 ZED/build/topology-switch-validation/tools/pluginval.app/Contents/MacOS/pluginval \
+arch -arm64 build/topology-switch-validation/tools/pluginval.app/Contents/MacOS/pluginval \
   --strictness-level 5 --random-seed 12345 \
-  --output-dir "$PWD/ZED/build/rc1-validation" \
+  --output-dir "$PWD/build/rc1-validation" \
   --output-filename pluginval-final-tests.txt \
-  --validate "$PWD/ZED/build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3" \
-  > ZED/build/rc1-validation/pluginval-final-console.log 2>&1
+  --validate "$PWD/build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3" \
+  > build/rc1-validation/pluginval-final-console.log 2>&1
 ```
 
 The AU installation was guarded against overwriting a file or symlink:
@@ -160,12 +170,12 @@ if [ -e "$HOME/Library/Audio/Plug-Ins/Components/ZED.component" ] || \
   exit 1
 fi
 mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
-ditto ZED/build/rc1-release/ZED_artefacts/Release/AU/ZED.component \
+ditto build/rc1-release/ZED_artefacts/Release/AU/ZED.component \
   "$HOME/Library/Audio/Plug-Ins/Components/ZED.component"
-arch -arm64 /usr/bin/auval -v aufx Zedd Soco > ZED/build/rc1-validation/auval.log 2>&1
+arch -arm64 /usr/bin/auval -v aufx Zedd Soco > build/rc1-validation/auval.log 2>&1
 # Initial registration was not yet visible. After discovery, retry succeeded:
-arch -arm64 /usr/bin/auval -al > ZED/build/rc1-validation/auval-discovery.log 2>&1
-arch -arm64 /usr/bin/auval -v aufx Zedd Soco > ZED/build/rc1-validation/auval-retry.log 2>&1
+arch -arm64 /usr/bin/auval -al > build/rc1-validation/auval-discovery.log 2>&1
+arch -arm64 /usr/bin/auval -v aufx Zedd Soco > build/rc1-validation/auval-retry.log 2>&1
 ```
 
 The first copy has already been installed; do not repeat the guarded copy as
@@ -209,8 +219,8 @@ Warnings and limitations:
 
 Built bundles (repository-relative):
 
-- `ZED/build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3`
-- `ZED/build/rc1-release/ZED_artefacts/Release/AU/ZED.component`
+- `build/rc1-release/ZED_artefacts/Release/VST3/ZED.vst3`
+- `build/rc1-release/ZED_artefacts/Release/AU/ZED.component`
 
 Each executable is `Contents/MacOS/ZED` inside its bundle. The AU test copy
 remains at `~/Library/Audio/Plug-Ins/Components/ZED.component`. No VST3 was

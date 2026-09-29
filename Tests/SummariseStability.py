@@ -39,8 +39,9 @@ def number(value):
 
 def summarise(root):
     root = root.resolve()
-    if not any(p.name == "build" and p.parent.name == "ZED" for p in (root, *root.parents)):
-        raise ValueError("Measurements and summary must stay beneath ZED/build")
+    build = (Path(__file__).resolve().parents[1] / "build").resolve()
+    if build not in (root, *root.parents):
+        raise ValueError("Measurements and summary must stay beneath build")
     data = {name: read(root, name) for name in
             ("matrix", "boundaries", "oscillation", "extended", "out_of_spec")}
     # Incomplete runs must not silently become a successful report.
@@ -133,5 +134,5 @@ def summarise(root):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        raise SystemExit("Usage: python3 ZED/Tests/SummariseStability.py ZED/build/<results>/<release-or-asan>")
+        raise SystemExit("Usage: python3 Tests/SummariseStability.py build/<results>/<release-or-asan>")
     summarise(Path(sys.argv[1]))

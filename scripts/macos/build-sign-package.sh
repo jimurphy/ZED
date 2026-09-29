@@ -69,10 +69,10 @@ progress "Installer identity: $installer_identity"
 
 # Refuse symlinked build roots. Each invocation has a unique staging tree, so
 # cleanup requires no recursive deletion and previous runs remain reviewable.
-[ ! -L "$repo/ZED/build" ] || die 'ZED/build must not be a symlink.'
-mkdir -p "$repo/ZED/build"
-build_area=$(cd "$repo/ZED/build" && pwd -P)
-[ "$build_area" = "$repo/ZED/build" ] || die 'Build area resolves outside the expected project path.'
+[ ! -L "$repo/build" ] || die 'build must not be a symlink.'
+mkdir -p "$repo/build"
+build_area=$(cd "$repo/build" && pwd -P)
+[ "$build_area" = "$repo/build" ] || die 'Build area resolves outside the expected project path.'
 work=$build_area/macos-release-package
 [ ! -L "$work" ] || die 'Packaging work directory must not be a symlink.'
 mkdir -p "$work"
@@ -82,7 +82,7 @@ stage=$run/payload
 mkdir -p "$stage" "$run/tmp"
 export TMPDIR=$run/tmp
 progress "Build: $build; staging: $stage"
-cmake -S "$repo/ZED" -B "$build" -G 'Unix Makefiles' \
+cmake -S "$repo" -B "$build" -G 'Unix Makefiles' \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=OFF
 cmake --build "$build" --config Release --target ZED_VST3 ZED_AU --parallel 4

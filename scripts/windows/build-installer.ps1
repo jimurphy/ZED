@@ -43,7 +43,7 @@ if (-not (Test-Path -LiteralPath $manifest -PathType Leaf)) { throw 'Missing VST
 $module = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json
 if ($module.Name -ne 'ZED' -or $module.Version -ne '1.0.0') { throw 'Unexpected VST3 metadata.' }
 
-# Outputs inside this repository must be under its ignored ZED/build tree.
+# Outputs inside this repository must be under its ignored build tree.
 # Refuse reparse points in the output ancestry to avoid redirecting writes.
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 if ($output -eq $bundle -or $output.StartsWith($bundle.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
@@ -59,10 +59,10 @@ while ($ancestor) {
     $ancestor = Split-Path -Parent $ancestor
 }
 $repoPrefix = $repo.TrimEnd('\') + '\'
-$buildPrefix = (Join-Path $repo 'ZED/build').TrimEnd('\') + '\'
+$buildPrefix = (Join-Path $repo 'build').TrimEnd('\') + '\'
 if ($output -eq $repo -or ($output.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase) -and
     -not $output.StartsWith($buildPrefix, [StringComparison]::OrdinalIgnoreCase))) {
-    throw 'Use a dedicated directory beneath ZED/build or outside the repository.'
+    throw 'Use a dedicated directory beneath build or outside the repository.'
 }
 if (Test-Path -LiteralPath $output) {
     if (-not (Test-Path -LiteralPath $output -PathType Container) -or
@@ -133,7 +133,7 @@ Write-Host "Inno Setup compiler: $compiler"
 Write-Host "Version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).FileVersion)"
 Write-Host "Product version: $([Diagnostics.FileVersionInfo]::GetVersionInfo($compiler).ProductVersion)"
 Write-Host "Validated Release-layout AMD64 VST3: $bundle"
-$definition = Join-Path $repo 'ZED/installer/windows/ZED.iss'
+$definition = Join-Path $repo 'installer/windows/ZED.iss'
 $compilerArguments = @("/DBundleSource=$bundle", "/DInstallerOutput=$output", $definition)
 # ISCC 6.7.x can have 0.0.0.0 version resources. Its exact engine version is
 # printed only after loading ISCmplr.dll for compilation. /O- disables output.

@@ -27,7 +27,7 @@ Symlinks are resolved before writing; output inside the worktree is rejected.
 An existing `ZED-1.0.0-rc.1-macOS-arm64.pkg` is never overwritten. Choose another
 external directory or explicitly move the previous package yourself.
 
-Each invocation uses a fresh, retained `ZED/build/macos-release-package/run.*`
+Each invocation uses a fresh, retained `build/macos-release-package/run.*`
 directory with `build`, `payload`, `tmp` and validation data. No recursive cleanup
 occurs and no earlier build is altered. Failed runs retain diagnostic material;
 an incomplete package may remain in an external `.zed-package.*` directory.

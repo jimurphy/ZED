@@ -1,7 +1,11 @@
 # Reset destination engines on activation
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Branch: `zed-topology-switch-reset`, from clean fetched master
-`c935cce427268efa7280fe7ac40e3b4246220491`. Validation date: 2026-09-19.
+`2bdaeec8e188fd4a4c710281808b88e25685d21e`. Validation date: 2026-09-19.
 
 ## Policy and engine identity
 
@@ -150,45 +154,45 @@ change history.
 ## Reproduction commands
 
 Run from the repository root, using fresh directories if these already exist.
-All artifacts/logs/tools stay in ignored `ZED/build/`. Reuse the clean pinned JUCE
+All artifacts/logs/tools stay in ignored `build/`. Reuse the clean pinned JUCE
 8.0.6 checkout (`51a8a6d7aeae7326956d747737ccf1575e61e209`); omit the source override
 to fetch that revision in a fresh clone.
 
 ```sh
-mkdir -p ZED/build/topology-switch-validation/tmp
-export TMPDIR="$PWD/ZED/build/topology-switch-validation/tmp"
-ZED_JUCE_SOURCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src"
+mkdir -p build/topology-switch-validation/tmp
+export TMPDIR="$PWD/build/topology-switch-validation/tmp"
+ZED_JUCE_SOURCE="$PWD/build/macos-arm64-release/_deps/juce-src"
 
-cmake -S ZED -B ZED/build/topology-switch-tests-release \
+cmake -S . -B build/topology-switch-tests-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/topology-switch-tests-release --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/topology-switch-tests-release --output-on-failure
+cmake --build build/topology-switch-tests-release --target ZEDChannelTests --parallel 4
+ctest --test-dir build/topology-switch-tests-release --output-on-failure
 
-cmake -S ZED -B ZED/build/topology-switch-debug-asan \
+cmake -S . -B build/topology-switch-debug-asan \
   -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE" \
   -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_CXX_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address
-cmake --build ZED/build/topology-switch-debug-asan --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/topology-switch-debug-asan --output-on-failure
+cmake --build build/topology-switch-debug-asan --target ZEDChannelTests --parallel 4
+ctest --test-dir build/topology-switch-debug-asan --output-on-failure
 
-cmake -S ZED -B ZED/build/topology-switch-release \
+cmake -S . -B build/topology-switch-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=OFF \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/topology-switch-release --target ZED_VST3 --parallel 4
-ZED_BUNDLE="$PWD/ZED/build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3"
+cmake --build build/topology-switch-release --target ZED_VST3 --parallel 4
+ZED_BUNDLE="$PWD/build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3"
 lipo -archs "$ZED_BUNDLE/Contents/MacOS/ZED"
 codesign --verify --deep --strict --verbose=2 "$ZED_BUNDLE"
 /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$ZED_BUNDLE/Contents/Info.plist"
 # Reuse the existing official pluginval 1.0.4 app in the new tools directory.
-arch -arm64 ZED/build/topology-switch-validation/tools/pluginval.app/Contents/MacOS/pluginval \
+arch -arm64 build/topology-switch-validation/tools/pluginval.app/Contents/MacOS/pluginval \
   --strictness-level 5 --random-seed 12345 \
-  --output-dir "$PWD/ZED/build/topology-switch-validation" \
+  --output-dir "$PWD/build/topology-switch-validation" \
   --output-filename pluginval-tests.txt --validate "$ZED_BUNDLE"
 git diff --check
 ```
@@ -203,25 +207,25 @@ times. Each file combines mono, stereo left-only and stereo right-only output:
 17,080 floats per configuration and rate, 273,280 floats across both rates.
 
 ```sh
-mkdir -p ZED/build/topology-master-reference
-git archive c935cce427268efa7280fe7ac40e3b4246220491 ZED | \
-  tar -x -C ZED/build/topology-master-reference
-cmake -S ZED/build/topology-master-reference/ZED \
-  -B ZED/build/topology-master-reference/build \
+mkdir -p build/topology-master-reference
+git archive 2bdaeec8e188fd4a4c710281808b88e25685d21e | \
+  tar -x -C build/topology-master-reference
+cmake -S build/topology-master-reference \
+  -B build/topology-master-reference/build \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/topology-master-reference/build --target ZEDChannelTests --parallel 4
-ZED_MASTER_TEST=ZED/build/topology-master-reference/build/ZEDChannelTests_artefacts/Release/ZEDChannelTests
-ZED_NEW_TEST=ZED/build/topology-switch-tests-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests
-"$ZED_MASTER_TEST" --dump-configurations ZED/build/topology-master-reference/output-48000
-"$ZED_MASTER_TEST" --dump-44100 ZED/build/topology-master-reference/output-44100
-"$ZED_NEW_TEST" --dump-configurations ZED/build/topology-switch-validation/output-48000
-"$ZED_NEW_TEST" --dump-44100 ZED/build/topology-switch-validation/output-44100
+cmake --build build/topology-master-reference/build --target ZEDChannelTests --parallel 4
+ZED_MASTER_TEST=build/topology-master-reference/build/ZEDChannelTests_artefacts/Release/ZEDChannelTests
+ZED_NEW_TEST=build/topology-switch-tests-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests
+"$ZED_MASTER_TEST" --dump-configurations build/topology-master-reference/output-48000
+"$ZED_MASTER_TEST" --dump-44100 build/topology-master-reference/output-44100
+"$ZED_NEW_TEST" --dump-configurations build/topology-switch-validation/output-48000
+"$ZED_NEW_TEST" --dump-44100 build/topology-switch-validation/output-44100
 for rate in 44100 48000; do
   for name in 0-0 0-1 0-2 0-3 1-0 1-1 2-0 3-0; do
-    cmp "ZED/build/topology-master-reference/output-$rate/$name.bin" \
-        "ZED/build/topology-switch-validation/output-$rate/$name.bin" || exit 1
+    cmp "build/topology-master-reference/output-$rate/$name.bin" \
+        "build/topology-switch-validation/output-$rate/$name.bin" || exit 1
   done
 done
 ```
@@ -230,7 +234,7 @@ done
 
 The build sets `COPY_PLUGIN_AFTER_BUILD FALSE`; it does not install or overwrite
 any plug-in. Test bundle:
-`ZED/build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3`.
+`build/topology-switch-release/ZED_artefacts/Release/VST3/ZED.vst3`.
 Executable: the bundle's `Contents/MacOS/ZED`.
 
 Quit Live before replacing a test copy. Back up an existing ZED installation,

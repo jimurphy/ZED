@@ -1,7 +1,11 @@
 # Mono/stereo correctness validation — 2026-09-18
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Branch: `zed-mono-stereo-support`, created from fetched, up-to-date master
-`4ba0198927765a4feb6604ffe986f60bab0f0953`.
+`0783f7bec90e18508182e9e2218dc7b1d8d01551`.
 
 ## Cause and changes
 
@@ -84,19 +88,19 @@ The normal build has no regression-test target or sanitizer/test compile flags.
 The final stereo dump still matches the original master dump byte for byte.
 
 ```sh
-(cd ZED && cmake --preset macos-arm64-release && cmake --build --preset macos-arm64-release --parallel 4)
-cmake --build ZED/build/channel-release --target ZEDChannelTests --parallel 4
-cmake --build ZED/build/channel-asan --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/channel-release --output-on-failure
-ctest --test-dir ZED/build/channel-asan --output-on-failure
-ZED/build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
-  --dump-stereo ZED/build/channel-release/stereo-reference/current.bin
-cmp ZED/build/channel-release/stereo-reference/master.bin ZED/build/channel-release/stereo-reference/current.bin
+(cmake --preset macos-arm64-release && cmake --build --preset macos-arm64-release --parallel 4)
+cmake --build build/channel-release --target ZEDChannelTests --parallel 4
+cmake --build build/channel-asan --target ZEDChannelTests --parallel 4
+ctest --test-dir build/channel-release --output-on-failure
+ctest --test-dir build/channel-asan --output-on-failure
+build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+  --dump-stereo build/channel-release/stereo-reference/current.bin
+cmp build/channel-release/stereo-reference/master.bin build/channel-release/stereo-reference/current.bin
 /usr/bin/arch -arm64 "$ZED_PLUGINVAL" --strictness-level 5 --random-seed 12345 \
-  --output-dir /tmp --output-filename zed-integration-pluginval-tests.txt \
-  --validate "$PWD/ZED/build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3"
-lipo -archs ZED/build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/MacOS/ZED
-codesign --verify --deep --strict --verbose=2 ZED/build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3
+  --output-dir build --output-filename zed-integration-pluginval-tests.txt \
+  --validate "$PWD/build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3"
+lipo -archs build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/MacOS/ZED
+codesign --verify --deep --strict --verbose=2 build/macos-arm64-release/ZED_artefacts/Release/VST3/ZED.vst3
 git diff --check
 ```
 
@@ -111,42 +115,42 @@ only the pinned JUCE source fetched by the earlier baseline build. On a clean
 checkout, omit the `FETCHCONTENT_SOURCE_DIR_JUCE` argument to fetch the same pin.
 
 ```sh
-cmake -S ZED -B ZED/build/channel-release \
+cmake -S . -B build/channel-release \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
-  > /tmp/zed-channel-configure.log 2>&1
-cmake --build ZED/build/channel-release --target ZEDChannelTests ZED_VST3 --parallel 4 \
-  > /tmp/zed-channel-build.log 2>&1
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
+  > build/zed-channel-configure.log 2>&1
+cmake --build build/channel-release --target ZEDChannelTests ZED_VST3 --parallel 4 \
+  > build/zed-channel-build.log 2>&1
 # After correcting the test target and silence-reference assertion:
-cmake --build ZED/build/channel-release --target ZEDChannelTests --parallel 4 \
-  > /tmp/zed-channel-test-final-build.log 2>&1
-ctest --test-dir ZED/build/channel-release --output-on-failure \
-  > /tmp/zed-channel-release-test-final.log 2>&1
+cmake --build build/channel-release --target ZEDChannelTests --parallel 4 \
+  > build/zed-channel-test-final-build.log 2>&1
+ctest --test-dir build/channel-release --output-on-failure \
+  > build/zed-channel-release-test-final.log 2>&1
 
-cmake -S ZED -B ZED/build/channel-asan \
+cmake -S . -B build/channel-asan \
   -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_CXX_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address \
-  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src" \
-  > /tmp/zed-channel-asan-configure.log 2>&1
-cmake --build ZED/build/channel-asan --target ZEDChannelTests --parallel 4 \
-  > /tmp/zed-channel-asan-build.log 2>&1
+  -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/macos-arm64-release/_deps/juce-src" \
+  > build/zed-channel-asan-configure.log 2>&1
+cmake --build build/channel-asan --target ZEDChannelTests --parallel 4 \
+  > build/zed-channel-asan-build.log 2>&1
 # After correcting the silence-reference assertion:
-cmake --build ZED/build/channel-asan --target ZEDChannelTests --parallel 4 \
-  > /tmp/zed-channel-asan-final-build.log 2>&1
-ctest --test-dir ZED/build/channel-asan --output-on-failure \
-  > /tmp/zed-channel-asan-test.log 2>&1
+cmake --build build/channel-asan --target ZEDChannelTests --parallel 4 \
+  > build/zed-channel-asan-final-build.log 2>&1
+ctest --test-dir build/channel-asan --output-on-failure \
+  > build/zed-channel-asan-test.log 2>&1
 
-lipo -archs ZED/build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/MacOS/ZED
-codesign --verify --deep --strict --verbose=2 ZED/build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3
+lipo -archs build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3/Contents/MacOS/ZED
+codesign --verify --deep --strict --verbose=2 build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3
 /usr/bin/arch -arm64 "$ZED_PLUGINVAL" \
-  --strictness-level 5 --random-seed 12345 --output-dir /tmp \
+  --strictness-level 5 --random-seed 12345 --output-dir build \
   --output-filename zed-channel-pluginval-tests.txt \
-  --validate "$PWD/ZED/build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3" \
-  > /tmp/zed-channel-pluginval.log 2>&1
+  --validate "$PWD/build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3" \
+  > build/zed-channel-pluginval.log 2>&1
 ```
 
 Set `ZED_PLUGINVAL` to the executable inside your pluginval 1.0.4 app bundle.
@@ -157,7 +161,7 @@ initializes macOS application services. No tests were disabled.
 ### Temporary stereo-reference build script
 
 The following is the complete source of
-`ZED/build/channel-release/stereo-reference/compare.py` (ignored build output).
+`build/channel-release/stereo-reference/compare.py` (ignored build output).
 It only writes to that ignored directory and never replaces the working source
 or production archive. Run it after building the final Release test executable.
 
@@ -168,19 +172,19 @@ import shutil
 import subprocess
 
 root = Path.cwd()
-build = root / 'ZED/build/channel-release'
+build = root / 'build/channel-release'
 reference = build / 'stereo-reference'
 reference.mkdir(exist_ok=True)
 source = reference / 'PluginProcessor.cpp'
 source.write_bytes(subprocess.check_output([
-    'git', 'show', '4ba0198927765a4feb6604ffe986f60bab0f0953:ZED/Source/PluginProcessor.cpp']))
+    'git', 'show', '0783f7bec90e18508182e9e2218dc7b1d8d01551:Source/PluginProcessor.cpp']))
 flags = {}
 for line in (build / 'CMakeFiles/ZED.dir/flags.make').read_text().splitlines():
     if ' = ' in line:
         key, value = line.split(' = ', 1)
         flags[key] = shlex.split(value)
 subprocess.run(['/usr/bin/c++', *flags['CXX_DEFINES'], *flags['CXX_INCLUDES'],
-                *flags['CXX_FLAGS'], '-I' + str(root / 'ZED/Source'),
+                *flags['CXX_FLAGS'], '-I' + str(root / 'Source'),
                 '-c', str(source), '-o', str(reference / 'PluginProcessor.cpp.o')], check=True)
 archive = reference / 'libZED_Reference.a'
 shutil.copy2(build / 'ZED_artefacts/Release/libZED_SharedCode.a', archive)
@@ -192,13 +196,13 @@ subprocess.run(link, cwd=build, check=True)
 ```
 
 ```sh
-python3 ZED/build/channel-release/stereo-reference/compare.py > /tmp/zed-stereo-reference-build.log 2>&1
-ZED/build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
-  --dump-stereo ZED/build/channel-release/stereo-reference/current.bin > /tmp/zed-stereo-current.log 2>&1
-ZED/build/channel-release/stereo-reference/ZEDReferenceTests \
-  --dump-stereo ZED/build/channel-release/stereo-reference/master.bin > /tmp/zed-stereo-master.log 2>&1
-cmp ZED/build/channel-release/stereo-reference/master.bin ZED/build/channel-release/stereo-reference/current.bin
-shasum -a 256 ZED/build/channel-release/stereo-reference/{master,current}.bin
+python3 build/channel-release/stereo-reference/compare.py > build/zed-stereo-reference-build.log 2>&1
+build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+  --dump-stereo build/channel-release/stereo-reference/current.bin > build/zed-stereo-current.log 2>&1
+build/channel-release/stereo-reference/ZEDReferenceTests \
+  --dump-stereo build/channel-release/stereo-reference/master.bin > build/zed-stereo-master.log 2>&1
+cmp build/channel-release/stereo-reference/master.bin build/channel-release/stereo-reference/current.bin
+shasum -a 256 build/channel-release/stereo-reference/{master,current}.bin
 ```
 
 ## Warnings, failures, and limits
@@ -227,6 +231,6 @@ shasum -a 256 ZED/build/channel-release/stereo-reference/{master,current}.bin
   true mono plug-in operation; genuine mono was covered by the automated tests.
 
 The completed bundle is `build/channel-release/ZED_artefacts/Release/VST3/ZED.vst3`
-relative to ZED. Logs are under `/tmp/zed-channel-*` and `/tmp/zed-stereo-*`, with
+relative to ZED. Logs are under `build/zed-channel-*` and `build/zed-stereo-*`, with
 CTest details in each build directory's `Testing/Temporary/LastTest.log`.
 Builds, render dumps, the reference script, and logs are not proposed for commit.

@@ -1,7 +1,11 @@
 # CMake baseline validation — 2026-09-17
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Branch: `zed-cmake-migration`. Starting HEAD:
-`a6d99b645ce66bfd266210f2156c38bdad420765`.
+`63eb230bf671e247f348038e50b162e5e17165d3`.
 During validation, no source edits or Projucer/IDE regeneration were performed.
 The user reported successful Ableton Live 12 testing of the preceding CMake build.
 This fresh build was tested with pluginval, not separately in Live.
@@ -43,9 +47,10 @@ The source override assumes the documented preset has already fetched JUCE.
 For a new checkout, omit `FETCHCONTENT_SOURCE_DIR_JUCE` to let CMake fetch the pin.
 
 ```sh
-ZED_VALIDATION_DIR="$(mktemp -d -t zed-baseline)"
-ZED_JUCE_SOURCE="$(pwd)/ZED/build/macos-arm64-release/_deps/juce-src"
-cmake -S ZED -B "$ZED_VALIDATION_DIR/release" \
+mkdir -p build
+ZED_VALIDATION_DIR="$(mktemp -d "$PWD/build/zed-baseline.XXXXXXXX")"
+ZED_JUCE_SOURCE="$(pwd)/build/macos-arm64-release/_deps/juce-src"
+cmake -S . -B "$ZED_VALIDATION_DIR/release" \
   -G 'Unix Makefiles' \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES=arm64 \
@@ -148,7 +153,7 @@ The repository `.gitignore` excludes macOS `.DS_Store` (including the lowercase
 `.DS_store` spelling). ZED's `.gitignore` excludes its actual CMake build tree,
 legacy macOS build products, local CMake presets/cache/generated files, and
 Xcode per-user state. The legacy shared Xcode and Visual Studio project files
-remain eligible for tracking; `ZED/Builds/` is not broadly ignored.
+remain eligible for tracking; `Builds/` is not broadly ignored.
 
 The fresh build, downloaded validator, and raw logs remain outside the repository.
 Source, DSP, parameters, identifiers, GUI, and shared legacy projects are unchanged.

@@ -1,7 +1,11 @@
 # Filter configuration parameter
 
+> Historical validation record. Commands, output paths and applicable commit IDs
+> have been adapted to the standalone repository; the recorded results were not
+> rerun during migration unless listed in MIGRATION.md.
+
 Implemented on `zed-filter-configuration-parameter`, based on clean, fetched
-master `650683c289006cbc0d252fe53ae2fdda84f1c9d9`. Validation date: 2026-09-18.
+master `872402d41ba4af644dedab2fc695aa0303ab56c5`. Validation date: 2026-09-18.
 
 The APVTS parameter `filterConfiguration` is a `juce::AudioParameterChoice`.
 Its fixed indices are the new preset and automation contract:
@@ -125,26 +129,27 @@ The JUCE source override reuses the existing clean pinned checkout; omit that
 argument on a fresh clone to have CMake fetch it.
 
 ```sh
-ZED_JUCE_SOURCE="$PWD/ZED/build/macos-arm64-release/_deps/juce-src"
-ZED_VALIDATION_DIR="$(mktemp -d -t zed-configuration-validation)"
-ZED_COMPARISON_DIR="$(mktemp -d -t zed-configuration-comparison)"
+mkdir -p build
+ZED_JUCE_SOURCE="$PWD/build/macos-arm64-release/_deps/juce-src"
+ZED_VALIDATION_DIR="$(mktemp -d "$PWD/build/zed-configuration-validation.XXXXXXXX")"
+ZED_COMPARISON_DIR="$(mktemp -d "$PWD/build/zed-configuration-comparison.XXXXXXXX")"
 
-cmake -S ZED -B ZED/build/channel-release -DCMAKE_BUILD_TYPE=Release \
+cmake -S . -B build/channel-release -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
   -DZED_BUILD_TESTS=ON -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
-cmake --build ZED/build/channel-release --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/channel-release --output-on-failure
+cmake --build build/channel-release --target ZEDChannelTests --parallel 4
+ctest --test-dir build/channel-release --output-on-failure
 
-cmake -S ZED -B ZED/build/channel-asan -DCMAKE_BUILD_TYPE=Debug \
+cmake -S . -B build/channel-asan -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
   -DZED_BUILD_TESTS=ON -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE" \
   -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_CXX_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
   -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address
-cmake --build ZED/build/channel-asan --target ZEDChannelTests --parallel 4
-ctest --test-dir ZED/build/channel-asan --output-on-failure
+cmake --build build/channel-asan --target ZEDChannelTests --parallel 4
+ctest --test-dir build/channel-asan --output-on-failure
 
-cmake -S ZED -B "$ZED_VALIDATION_DIR/release" -DCMAKE_BUILD_TYPE=Release \
+cmake -S . -B "$ZED_VALIDATION_DIR/release" -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
   -DZED_BUILD_TESTS=OFF -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
 cmake --build "$ZED_VALIDATION_DIR/release" --target ZED_VST3 --parallel 4
@@ -164,22 +169,22 @@ Raw local logs were retained in temporary storage, not added to the repository.
 
 Final pre-commit validation repeated both CTest suites successfully (Release
 3.89 seconds; Debug/ASan 4.66 seconds). A fresh production build used
-`ZED/build/configuration-final-release` instead of the temporary release directory
+`build/configuration-final-release` instead of the temporary release directory
 above, with the same configure options and `ZED_VST3` build command. Its executable
 was arm64, strict signature verification passed, and pluginval strictness 5 with
 seed 12345 passed. State round-trips for all eight choices, absence of processing
 parameter mutation, editor synchronization and mono/stereo regressions all passed
-again. The existing `ZED/build/ZED.vst3` bundle was not overwritten.
+again. The existing `build/ZED.vst3` bundle was not overwritten.
 
 ### Recreating the external master harness
 
 ```sh
-git archive 650683c289006cbc0d252fe53ae2fdda84f1c9d9 ZED | tar -x -C "$ZED_COMPARISON_DIR"
+git archive 872402d41ba4af644dedab2fc695aa0303ab56c5 | tar -x -C "$ZED_COMPARISON_DIR"
 export ZED_COMPARISON_DIR
 python3 - <<'PY'
 import os
 from pathlib import Path
-p = Path(os.environ['ZED_COMPARISON_DIR']) / 'ZED/Tests/ChannelLayouts.cpp'
+p = Path(os.environ['ZED_COMPARISON_DIR']) / 'Tests/ChannelLayouts.cpp'
 s = p.read_text().replace('#include <fstream>', '#include <fstream>\n#include <filesystem>')
 s = s.replace('        require(argc == 1 || dumpStereo, "Usage: ZEDChannelTests [--dump-stereo file]");', '''        const bool dumpConfigurations = argc == 3 && juce::String(argv[1]) == "--dump-configurations";
         require(argc == 1 || dumpStereo || dumpConfigurations, "Invalid arguments");
@@ -201,14 +206,14 @@ s = s.replace('''                if (dumpStereo)
                 {''')
 p.write_text(s)
 PY
-cmake -S "$ZED_COMPARISON_DIR/ZED" -B "$ZED_COMPARISON_DIR/build" \
+cmake -S "$ZED_COMPARISON_DIR" -B "$ZED_COMPARISON_DIR/build" \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZED_BUILD_TESTS=ON \
   -DFETCHCONTENT_SOURCE_DIR_JUCE="$ZED_JUCE_SOURCE"
 cmake --build "$ZED_COMPARISON_DIR/build" --target ZEDChannelTests --parallel 4
 "$ZED_COMPARISON_DIR/build/ZEDChannelTests_artefacts/Release/ZEDChannelTests" \
   --dump-configurations "$ZED_COMPARISON_DIR/master-output"
-ZED/build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
+build/channel-release/ZEDChannelTests_artefacts/Release/ZEDChannelTests \
   --dump-configurations "$ZED_COMPARISON_DIR/current-output"
 for name in 0-0 0-1 0-2 0-3 1-0 1-1 2-0 3-0; do
   cmp "$ZED_COMPARISON_DIR/master-output/$name.bin" "$ZED_COMPARISON_DIR/current-output/$name.bin" || exit 1
