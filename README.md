@@ -3,24 +3,24 @@
 ## Overview
 
 <p align="center">
-  <a href="docs/images/zed-interface-svf.png">
+  <a href="docs/images/zed-interface.png">
     <img
-      src="docs/images/zed-interface-svf.png"
-      alt="ZED interface showing the state-variable filter"
+      src="docs/images/zed-interface.png"
+      alt="ZED interface showing the state-variable filter in low-pass mode"
       width="300"
     >
   </a>
-  <a href="docs/images/zed-interface-ladder.png">
+  <a href="docs/images/zed-bpf.png">
     <img
-      src="docs/images/zed-interface-ladder.png"
-      alt="ZED interface showing a ladder filter"
+      src="docs/images/zed-bpf.png"
+      alt="ZED interface showing a band pass filter"
       width="300"
     >
   </a>
 </p>
 
 <p align="center">
-  <em>Left: state-variable filter. Right: ladder filter.</em>
+  <em>Left: Lowpass filter. Right: Bandpass filter.</em>
 </p>
 
 ZED, by South Coast Synthesis, is an audio filter plug-in featuring four analogue-modelled filter designs. Analogue-inspired input distortion and feedback paths provide distinctive timbral colouring, while modern digital filter-processing techniques support stable self-oscillation and rapid modulation. Zed is free to use.
