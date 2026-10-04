@@ -2,7 +2,28 @@
 
 ## Overview
 
-ZED, by South Coast Synthesis, is a free filter plug-in featuring four analogue-modelled filter designs. Analogue-inspired input distortion and feedback paths provide distinctive timbral colouring, while modern digital filter-processing techniques support stable self-oscillation and rapid modulation.
+<p align="center">
+  <a href="docs/images/zed-interface.png">
+    <img
+      src="docs/images/zed-interface.png"
+      alt="ZED interface showing the state-variable filter in low-pass mode"
+      width="300"
+    >
+  </a>
+  <a href="docs/images/zed-bpf.png">
+    <img
+      src="docs/images/zed-bpf.png"
+      alt="ZED interface showing a band pass filter"
+      width="300"
+    >
+  </a>
+</p>
+
+<p align="center">
+  <em>Left: Lowpass filter. Right: Bandpass filter.</em>
+</p>
+
+ZED, by South Coast Synthesis, is an audio filter plug-in featuring four analogue-modelled filter designs. Analogue-inspired input distortion and feedback paths provide distinctive timbral colouring, while modern digital filter-processing techniques support stable self-oscillation and rapid modulation. Zed is free to use.
 
 Inspired by Ableton Live's filter effect, ZED offers a classic state-variable filter, a Korg MS-10/MS-20-inspired Sallen–Key filter, and two different ladder filters: a Moog-inspired transistor ladder and an ARP-inspired diode ladder. All original signal-processing and interface code was written specifically for ZED using purpose-built DSP functions.
 
